@@ -1,0 +1,3053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DropRadar Field Edition — Geofence, Live GPS &amp; Call-Routing Tracker</title>
+    <style>
+        /* ==========================================================================
+           DropRadar Field Edition — Self-Contained High-Contrast Design System
+           Zero external stylesheet/CDN dependencies; 48px+ accessible touch targets;
+           explicit dark slate/navy, emerald, cyan, and amber design tokens.
+           ========================================================================== */
+        :root {
+            --bg-canvas: #060b16;
+            --bg-surface: #0d1629;
+            --bg-surface-elevated: #14223d;
+            --bg-surface-muted: #091120;
+            --border-subtle: rgba(148, 163, 184, 0.24);
+            --border-strong: rgba(34, 211, 238, 0.45);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --accent-emerald: #10b981;
+            --accent-emerald-bright: #34d399;
+            --accent-emerald-bg: rgba(16, 185, 129, 0.16);
+            --accent-cyan: #06b6d4;
+            --accent-cyan-bright: #22d3ee;
+            --accent-cyan-bg: rgba(6, 182, 212, 0.16);
+            --accent-amber: #f59e0b;
+            --accent-amber-bright: #fbbf24;
+            --accent-amber-bg: rgba(245, 158, 11, 0.16);
+            --accent-indigo: #818cf8;
+            --accent-rose: #fb7185;
+            --accent-rose-bg: rgba(251, 113, 133, 0.16);
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 18px;
+            --radius-pill: 9999px;
+            --shadow-card: 0 10px 28px rgba(0, 0, 0, 0.46);
+            --touch-min: 48px;
+        }
+
+        html.large-text {
+            font-size: 116%;
+        }
+
+        html.large-text .card-title {
+            font-size: 1.16rem;
+        }
+
+        html.large-text .btn {
+            min-height: 54px;
+            font-size: 1rem;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 16px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button, input, textarea, select {
+            font-family: inherit;
+            color: inherit;
+        }
+
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible,
+        textarea:focus-visible,
+        select:focus-visible {
+            outline: 3px solid var(--accent-cyan-bright);
+            outline-offset: 2px;
+        }
+
+        /* ==========================================================================
+           Top Navigation Header
+           ========================================================================== */
+        .app-header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: rgba(6, 11, 22, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 12px 16px;
+        }
+
+        .header-inner {
+            max-width: 1380px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .brand-lockup {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-height: var(--touch-min);
+        }
+
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.24), rgba(6, 182, 212, 0.26));
+            border: 1.5px solid rgba(34, 211, 238, 0.5);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .brand-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .brand-name {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+        }
+
+        .brand-edition {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 3px 9px;
+            border-radius: var(--radius-pill);
+            background: var(--accent-emerald-bg);
+            color: var(--accent-emerald-bright);
+            border: 1px solid rgba(52, 211, 153, 0.4);
+        }
+
+        .brand-subtitle {
+            margin: 2px 0 0;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .header-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ==========================================================================
+           Buttons, Badges & Form Controls (48px+ Minimum Touch Targets)
+           ========================================================================== */
+        .btn {
+            min-height: var(--touch-min);
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--border-subtle);
+            background-color: var(--bg-surface-elevated);
+            color: var(--text-primary);
+            font-size: 0.92rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background-color: #1c2e52;
+            border-color: var(--border-strong);
+        }
+
+        .btn:active {
+            transform: scale(0.985);
+        }
+
+        .btn-sm {
+            min-height: var(--touch-min);
+            padding: 8px 13px;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #059669, #0891b2);
+            border-color: rgba(52, 211, 153, 0.6);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+        }
+
+        .btn-emerald {
+            background-color: var(--accent-emerald-bg);
+            border-color: rgba(52, 211, 153, 0.45);
+            color: var(--accent-emerald-bright);
+        }
+
+        .btn-cyan {
+            background-color: var(--accent-cyan-bg);
+            border-color: rgba(34, 211, 238, 0.45);
+            color: var(--accent-cyan-bright);
+        }
+
+        .btn-amber {
+            background-color: var(--accent-amber-bg);
+            border-color: rgba(251, 191, 36, 0.45);
+            color: var(--accent-amber-bright);
+        }
+
+        .btn-rose {
+            background-color: var(--accent-rose-bg);
+            border-color: rgba(251, 113, 133, 0.45);
+            color: var(--accent-rose);
+        }
+
+        .btn.is-active {
+            background-color: var(--accent-cyan-bg);
+            border-color: var(--accent-cyan-bright);
+            color: #ffffff;
+            box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.35);
+        }
+
+        .pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 30px;
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            font-size: 0.76rem;
+            font-weight: 700;
+            border: 1px solid transparent;
+        }
+
+        .badge-emerald {
+            background: var(--accent-emerald-bg);
+            color: var(--accent-emerald-bright);
+            border-color: rgba(52, 211, 153, 0.35);
+        }
+
+        .badge-cyan {
+            background: var(--accent-cyan-bg);
+            color: var(--accent-cyan-bright);
+            border-color: rgba(34, 211, 238, 0.35);
+        }
+
+        .badge-amber {
+            background: var(--accent-amber-bg);
+            color: var(--accent-amber-bright);
+            border-color: rgba(251, 191, 36, 0.35);
+        }
+
+        .badge-muted {
+            background: rgba(148, 163, 184, 0.14);
+            color: var(--text-secondary);
+            border-color: rgba(148, 163, 184, 0.25);
+        }
+
+        .field-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .input-field, .textarea-field, .select-field {
+            width: 100%;
+            min-height: var(--touch-min);
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--border-subtle);
+            background-color: var(--bg-surface-muted);
+            color: var(--text-primary);
+            font-size: 0.92rem;
+        }
+
+        .textarea-field {
+            min-height: 76px;
+            resize: vertical;
+        }
+
+        .mono-readout {
+            font-family: var(--font-mono);
+            font-size: 0.84rem;
+            color: var(--accent-cyan-bright);
+            background: var(--bg-surface-muted);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 8px 10px;
+            word-break: break-all;
+        }
+
+        /* ==========================================================================
+           Main Layout & Cards
+           ========================================================================== */
+        .main-shell {
+            max-width: 1380px;
+            margin: 0 auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .status-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .stat-tile {
+            background: var(--bg-surface);
+            border: 1.5px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 14px 16px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .stat-tile.is-alert {
+            border-color: rgba(52, 211, 153, 0.7);
+            background: linear-gradient(180deg, rgba(16, 185, 129, 0.16), var(--bg-surface));
+        }
+
+        .stat-tile.is-routed {
+            border-color: rgba(251, 191, 36, 0.7);
+            background: linear-gradient(180deg, rgba(245, 158, 11, 0.16), var(--bg-surface));
+        }
+
+        .stat-kicker {
+            font-size: 0.74rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            margin: 4px 0 2px;
+            font-size: 1.14rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        .stat-sub {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 1024px) {
+            .workspace-grid {
+                grid-template-columns: 1.35fr 1fr;
+                align-items: start;
+            }
+        }
+
+        .col-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--bg-surface);
+            border: 1.5px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .card-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        /* ==========================================================================
+           High-DPI Radar & Satellite Canvas Viewport (Guaranteed >= 320px Height)
+           ========================================================================== */
+        .map-viewport {
+            position: relative;
+            width: 100%;
+            min-height: 320px;
+            height: 330px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1.5px solid var(--border-strong);
+            background-color: #142a1e;
+            touch-action: manipulation;
+        }
+
+        @media (min-width: 768px) {
+            .map-viewport {
+                min-height: 400px;
+                height: 420px;
+            }
+        }
+
+        .map-viewport canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        .map-hud-top {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .map-hud-pill {
+            pointer-events: auto;
+            background: rgba(6, 11, 22, 0.88);
+            border: 1px solid rgba(56, 189, 248, 0.38);
+            border-radius: var(--radius-pill);
+            padding: 6px 12px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .map-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            background: var(--bg-surface-muted);
+            border: 1px solid var(--border-subtle);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .legend-swatch {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ==========================================================================
+           Coordinate Blocks & Toggle Rows
+           ========================================================================== */
+        .coord-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 640px) {
+            .coord-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .coord-box {
+            background: var(--bg-surface-muted);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .coord-dms {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .coord-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .coord-inputs input {
+            min-height: 48px;
+            padding: 6px 8px;
+            font-size: 0.82rem;
+            font-family: var(--font-mono);
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            background: var(--bg-surface-muted);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .toggle-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .toggle-desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .switch-btn {
+            position: relative;
+            width: 58px;
+            min-width: 58px;
+            height: 36px;
+            border-radius: var(--radius-pill);
+            border: 1.5px solid var(--border-subtle);
+            background: #1e293b;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .switch-btn::after {
+            content: "";
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #ffffff;
+            transition: transform 0.2s ease;
+        }
+
+        .switch-btn[aria-checked="true"] {
+            background: var(--accent-emerald);
+            border-color: var(--accent-emerald-bright);
+        }
+
+        .switch-btn[aria-checked="true"]::after {
+            transform: translateX(22px);
+        }
+
+        .payload-box {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            line-height: 1.48;
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: var(--bg-surface-muted);
+            border: 1px solid var(--border-strong);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            color: #e2e8f0;
+        }
+
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .order-item {
+            width: 100%;
+            min-height: 56px;
+            text-align: left;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--border-subtle);
+            background: var(--bg-surface-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .order-item.is-selected {
+            border-color: var(--accent-cyan-bright);
+            background: rgba(6, 182, 212, 0.15);
+        }
+
+        .log-list {
+            max-height: 210px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .log-entry {
+            font-size: 0.78rem;
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-surface-muted);
+            border-left: 3px solid var(--accent-cyan);
+            color: var(--text-secondary);
+        }
+
+        .log-time {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-right: 6px;
+        }
+
+        /* ==========================================================================
+           Right-Corner Profile Drawer & Searchable [ Find Your Order ] Modal
+           ========================================================================== */
+        .backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 60;
+            background: rgba(2, 6, 15, 0.78);
+            backdrop-filter: blur(4px);
+            display: none;
+        }
+
+        .backdrop.is-open {
+            display: block;
+        }
+
+        .drawer-right {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: min(450px, 100vw);
+            z-index: 70;
+            background: var(--bg-surface);
+            border-left: 1.5px solid var(--border-strong);
+            box-shadow: -12px 0 36px rgba(0, 0, 0, 0.68);
+            padding: 18px 16px 32px;
+            overflow-y: auto;
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .drawer-right.is-open {
+            display: flex;
+        }
+
+        .modal-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(700px, calc(100vw - 24px));
+            max-height: calc(100vh - 32px);
+            overflow-y: auto;
+            z-index: 75;
+            background: var(--bg-surface);
+            border: 1.5px solid var(--border-strong);
+            border-radius: var(--radius-lg);
+            padding: 18px 16px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.78);
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .modal-card.is-open {
+            display: flex;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+            gap: 8px;
+        }
+
+        .platform-chip {
+            min-height: 48px;
+            padding: 8px 10px;
+            border-radius: var(--radius-md);
+            border: 1.5px solid var(--border-subtle);
+            background: var(--bg-surface-muted);
+            color: var(--text-primary);
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .platform-chip.is-selected {
+            border-color: var(--accent-emerald-bright);
+            background: var(--accent-emerald-bg);
+            color: #ffffff;
+        }
+
+        .toast-banner {
+            position: fixed;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            z-index: 90;
+            background: #0f172a;
+            border: 1.5px solid var(--accent-cyan-bright);
+            color: #ffffff;
+            padding: 12px 18px;
+            border-radius: var(--radius-pill);
+            font-size: 0.88rem;
+            font-weight: 700;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            max-width: calc(100vw - 24px);
+            text-align: center;
+        }
+
+        .toast-banner.is-visible {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Diagnostic Error Boundary Panel (Never Blank Screen) */
+        #error-boundary-panel {
+            display: none;
+            max-width: 780px;
+            margin: 24px auto;
+            padding: 20px;
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--accent-rose);
+            background: #1f0d16;
+            color: #ffe4e6;
+        }
+
+        #error-boundary-panel.is-visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Runtime Error Boundary Panel -->
+    <div id="error-boundary-panel" role="alert">
+        <h2 style="margin:0 0 8px;font-size:1.15rem;color:#fda4af;">DropRadar Diagnostic Recovery Panel</h2>
+        <p style="margin:0 0 12px;font-size:0.9rem;">A runtime exception was caught safely so the screen never renders blank.</p>
+        <pre id="error-boundary-details" class="mono-readout" style="margin-bottom:12px;"></pre>
+        <button type="button" id="btn-recover-reset" class="btn btn-rose">Reset Saved State &amp; Reload</button>
+    </div>
+
+    <div id="app-root">
+        <!-- ======================================================================
+             1. Top Navigation Bar
+             ====================================================================== -->
+        <header class="app-header">
+            <div class="header-inner">
+                <div class="brand-lockup">
+                    <div class="brand-logo" aria-hidden="true">
+                        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                            <circle cx="16" cy="16" r="13" stroke="#22d3ee" stroke-width="2" stroke-dasharray="4 3" />
+                            <circle cx="16" cy="16" r="7" stroke="#34d399" stroke-width="2" />
+                            <circle cx="16" cy="16" r="3" fill="#34d399" />
+                            <line x1="16" y1="16" x2="26" y2="7" stroke="#22d3ee" stroke-width="2.2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="brand-title-row">
+                            <h1 class="brand-name">DropRadar</h1>
+                            <span class="brand-edition">Field Edition</span>
+                        </div>
+                        <p class="brand-subtitle">Geofence Proximity, Live GPS &amp; Quiet Backup Call Routing</p>
+                    </div>
+                </div>
+
+                <nav class="header-actions" aria-label="Primary actions">
+                    <button type="button" id="btn-open-find-order" class="btn btn-primary">
+                        [ Find Your Order ]
+                    </button>
+                    <a id="btn-header-gmaps" href="https://www.google.com/maps?q=28.613900,77.209000" target="_blank" rel="noopener noreferrer" class="btn btn-cyan">
+                        Google Maps ↗
+                    </a>
+                    <button type="button" id="btn-toggle-large-text" class="btn" aria-pressed="false">
+                        Aa+ Large Text
+                    </button>
+                    <button type="button" id="btn-open-profile-drawer" class="btn btn-emerald">
+                        Profile
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- ======================================================================
+             Main Workspace
+             ====================================================================== -->
+        <main class="main-shell">
+            <!-- Top Live Status Strip -->
+            <section class="status-strip" aria-label="Live status summary">
+                <div class="stat-tile" id="tile-geofence">
+                    <div class="stat-kicker">Home Geofence Status</div>
+                    <div class="stat-value" id="stat-geofence-value">Monitoring Perimeter</div>
+                    <div class="stat-sub" id="stat-geofence-sub">Calculating rider distance...</div>
+                </div>
+
+                <div class="stat-tile" id="tile-routing">
+                    <div class="stat-kicker">Call Routing &amp; Quiet Shield</div>
+                    <div class="stat-value" id="stat-routing-value">Quiet Shield Active</div>
+                    <div class="stat-sub" id="stat-routing-sub">Calls stay quiet unless College Zone entered</div>
+                </div>
+
+                <div class="stat-tile">
+                    <div class="stat-kicker">Active Monitored Order</div>
+                    <div class="stat-value" id="stat-order-value">Swiggy Instamart</div>
+                    <div class="stat-sub" id="stat-order-sub">Order #ORD-IM-88412</div>
+                </div>
+            </section>
+
+            <div class="workspace-grid">
+                <!-- Left Column: High-DPI Satellite & Radar Map + Exact Lat/Lng + Quiet Drop Pin -->
+                <div class="col-stack">
+                    <!-- 2. High-DPI HTML5 Canvas Satellite & Radar Map -->
+                    <section class="card" aria-labelledby="map-section-title">
+                        <div class="card-header">
+                            <h2 class="card-title" id="map-section-title">Live Satellite &amp; Radar Geofence Map</h2>
+                            <div class="pill-group">
+                                <button type="button" class="btn btn-sm is-active" data-layer-mode="satellite">Satellite</button>
+                                <button type="button" class="btn btn-sm" data-layer-mode="radar">Radar Grid</button>
+                                <button type="button" class="btn btn-sm" data-layer-mode="street">Street View</button>
+                                <button type="button" id="btn-toggle-sat-labels" class="btn btn-sm is-active" aria-pressed="true">Labels &amp; Grid</button>
+                            </div>
+                        </div>
+
+                        <div class="pill-group" style="margin-bottom:10px;">
+                            <span style="align-self:center;font-size:0.78rem;color:var(--text-muted);font-weight:700;">Click map to Set:</span>
+                            <button type="button" class="btn btn-sm is-active" data-click-mode="home">Home</button>
+                            <button type="button" class="btn btn-sm" data-click-mode="college">College</button>
+                            <button type="button" class="btn btn-sm" data-click-mode="drop">Drop Pin</button>
+                        </div>
+
+                        <div class="pill-group" style="margin-bottom:10px;">
+                            <button type="button" id="btn-sim-approach" class="btn btn-sm btn-primary">
+                                Simulate Driver Entering Zone
+                            </button>
+                            <button type="button" id="btn-sim-step" class="btn btn-sm">
+                                Step Closer (-180m)
+                            </button>
+                            <button type="button" id="btn-sim-reset" class="btn btn-sm">
+                                Reset Rider
+                            </button>
+                            <button type="button" id="btn-watch-gps" class="btn btn-sm btn-emerald" aria-pressed="false">
+                                Live GPS Watch: OFF
+                            </button>
+                        </div>
+
+                        <div class="pill-group" style="margin-bottom:12px;">
+                            <button type="button" id="btn-zoom-in" class="btn btn-sm" aria-label="Zoom in map">+</button>
+                            <button type="button" id="btn-zoom-out" class="btn btn-sm" aria-label="Zoom out map">-</button>
+                            <button type="button" id="btn-zoom-reset" class="btn btn-sm">Reset</button>
+                            <span style="align-self:center;font-size:0.78rem;color:var(--text-muted);margin-left:4px;">Home Alert Radius:</span>
+                            <button type="button" class="btn btn-sm" data-radius="250">250m</button>
+                            <button type="button" class="btn btn-sm is-active" data-radius="500">500m</button>
+                            <button type="button" class="btn btn-sm" data-radius="1000">1km</button>
+                            <button type="button" class="btn btn-sm" data-radius="2000">2km</button>
+                        </div>
+
+                        <div class="map-viewport" id="map-viewport">
+                            <canvas id="radar-canvas" width="640" height="360" aria-label="Interactive geofence satellite and radar map"></canvas>
+                            <div class="map-hud-top">
+                                <span class="map-hud-pill" id="hud-mode-pill">SATELLITE • CLICK MAP TO SET HOME</span>
+                                <span class="map-hud-pill" id="hud-dist-pill">Distance: --</span>
+                            </div>
+                        </div>
+
+                        <div class="map-legend">
+                            <span class="legend-item"><span class="legend-swatch" style="background:#10b981;"></span>Your Home</span>
+                            <span class="legend-item"><span class="legend-swatch" style="background:#f59e0b;"></span>College Zone</span>
+                            <span class="legend-item"><span class="legend-swatch" style="background:#22d3ee;"></span>Live Rider</span>
+                            <span class="legend-item"><span class="legend-swatch" style="background:#818cf8;"></span>Driver Drop Pin</span>
+                            <span class="legend-item"><span class="legend-swatch" style="background:#38bdf8;"></span>My Live GPS</span>
+                        </div>
+                    </section>
+
+                    <!-- 3. Exact Latitude & Longitude Controls (6-decimal & DMS) -->
+                    <section class="card" aria-labelledby="coords-section-title">
+                        <div class="card-header">
+                            <h2 class="card-title" id="coords-section-title">Exact Latitude &amp; Longitude Controls</h2>
+                            <span class="badge badge-cyan">6-Decimal + DMS</span>
+                        </div>
+
+                        <div class="pill-group" style="margin-bottom:12px;">
+                            <button type="button" class="btn btn-sm" data-preset="main-residence">Main Residence</button>
+                            <button type="button" class="btn btn-sm" data-preset="north-campus">North Campus</button>
+                            <button type="button" class="btn btn-sm" data-preset="student-hostel">Student Hostel</button>
+                            <button type="button" class="btn btn-sm" data-preset="tech-park-gate">Tech Park Gate</button>
+                        </div>
+
+                        <div class="coord-grid">
+                            <!-- Home Coordinates -->
+                            <div class="coord-box">
+                                <div style="display:flex;justify-content:space-between;align-items:center;">
+                                    <strong style="font-size:0.86rem;color:#34d399;">Your Home Zone</strong>
+                                    <button type="button" id="btn-copy-home-coord" class="btn btn-sm" style="min-height:48px;padding:6px 12px;font-size:0.78rem;">Copy</button>
+                                </div>
+                                <div class="mono-readout" id="readout-home-dec">28.613900, 77.209000</div>
+                                <div class="coord-dms" id="readout-home-dms">28°36'50.0"N 77°12'32.4"E</div>
+                                <div class="coord-inputs">
+                                    <input type="number" step="0.000001" id="input-home-lat" class="input-field" aria-label="Home Latitude" />
+                                    <input type="number" step="0.000001" id="input-home-lng" class="input-field" aria-label="Home Longitude" />
+                                </div>
+                                <button type="button" id="btn-apply-home-coord" class="btn btn-sm btn-emerald">Apply Home</button>
+                            </div>
+
+                            <!-- College Coordinates -->
+                            <div class="coord-box">
+                                <div style="display:flex;justify-content:space-between;align-items:center;">
+                                    <strong style="font-size:0.86rem;color:#fbbf24;">Your College Zone</strong>
+                                    <button type="button" id="btn-copy-college-coord" class="btn btn-sm" style="min-height:48px;padding:6px 12px;font-size:0.78rem;">Copy</button>
+                                </div>
+                                <div class="mono-readout" id="readout-college-dec">28.628900, 77.215000</div>
+                                <div class="coord-dms" id="readout-college-dms">28°37'44.0"N 77°12'54.0"E</div>
+                                <div class="coord-inputs">
+                                    <input type="number" step="0.000001" id="input-college-lat" class="input-field" aria-label="College Latitude" />
+                                    <input type="number" step="0.000001" id="input-college-lng" class="input-field" aria-label="College Longitude" />
+                                </div>
+                                <button type="button" id="btn-apply-college-coord" class="btn btn-sm btn-amber">Apply College</button>
+                            </div>
+
+                            <!-- Live Rider Coordinates -->
+                            <div class="coord-box">
+                                <div style="display:flex;justify-content:space-between;align-items:center;">
+                                    <strong style="font-size:0.86rem;color:#22d3ee;">Live Rider Position</strong>
+                                    <button type="button" id="btn-copy-rider-coord" class="btn btn-sm" style="min-height:48px;padding:6px 12px;font-size:0.78rem;">Copy</button>
+                                </div>
+                                <div class="mono-readout" id="readout-rider-dec">28.619500, 77.212800</div>
+                                <div class="coord-dms" id="readout-rider-dms">28°37'10.2"N 77°12'46.1"E</div>
+                                <div class="coord-inputs">
+                                    <input type="number" step="0.000001" id="input-rider-lat" class="input-field" aria-label="Rider Latitude" />
+                                    <input type="number" step="0.000001" id="input-rider-lng" class="input-field" aria-label="Rider Longitude" />
+                                </div>
+                                <button type="button" id="btn-apply-rider-coord" class="btn btn-sm btn-cyan">Apply Rider</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 5. Driver Dispatch Payload & Quiet Delivery Note -->
+                    <section class="card" aria-labelledby="droppin-section-title">
+                        <div class="card-header">
+                            <h2 class="card-title" id="droppin-section-title">Driver Dispatch Payload &amp; Quiet Delivery Note</h2>
+                            <span class="badge badge-muted" id="droppin-status-badge">Ready to Share</span>
+                        </div>
+
+                        <label class="field-label">Drop Pin Source</label>
+                        <div class="pill-group" style="margin-bottom:10px;">
+                            <button type="button" class="btn btn-sm is-active" data-drop-source="home">Saved Home Pin</button>
+                            <button type="button" class="btn btn-sm" data-drop-source="gps">Current Live GPS</button>
+                            <button type="button" class="btn btn-sm" data-drop-source="custom">Custom Drop Spot</button>
+                        </div>
+
+                        <div class="mono-readout" id="live-gps-readout" style="margin-bottom:12px;">
+                            Live Device GPS: Standby — tap Live GPS Watch or Check My Live GPS
+                        </div>
+
+                        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">
+                            <div class="toggle-row">
+                                <div>
+                                    <div class="toggle-title">Coordinate Precision</div>
+                                    <div class="toggle-desc" id="precision-desc">Exact 6-decimal coordinates</div>
+                                </div>
+                                <button type="button" id="btn-toggle-precision" class="btn btn-sm is-active">Exact Pin</button>
+                            </div>
+
+                            <div class="toggle-row">
+                                <div>
+                                    <div class="toggle-title">Auto-Prepare Dispatch on Home Zone Entry</div>
+                                    <div class="toggle-desc">Logs dispatch payload automatically when driver enters alert zone</div>
+                                </div>
+                                <button type="button" class="switch-btn" id="toggle-autosend-pin" role="switch" aria-checked="true" aria-label="Auto-Prepare Dispatch on Home Zone Entry"></button>
+                            </div>
+                        </div>
+
+                        <label class="field-label" for="input-drop-note">Quiet / No-Call &amp; Gate Instructions</label>
+                        <textarea id="input-drop-note" class="textarea-field" rows="2"></textarea>
+
+                        <div style="margin:12px 0;">
+                            <span class="field-label">Direct Map Links</span>
+                            <div class="pill-group">
+                                <a id="link-share-gmaps" href="https://www.google.com/maps?q=28.613900,77.209000" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-emerald">
+                                    Open Google Maps ↗
+                                </a>
+                                <button type="button" id="btn-copy-gmaps" class="btn btn-sm">Copy Google Maps Link</button>
+                                <a id="link-share-osm" href="https://www.openstreetmap.org/?mlat=28.613900&mlon=77.209000#map=17/28.613900/77.209000" target="_blank" rel="noopener noreferrer" class="btn btn-sm">
+                                    OpenStreetMap ↗
+                                </a>
+                                <button type="button" id="btn-copy-osm" class="btn btn-sm">Copy OSM Link</button>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:12px;">
+                            <span class="field-label">Driver Dispatch Payload &amp; Quiet Note</span>
+                            <div class="payload-box" id="driver-payload-box"></div>
+                        </div>
+
+                        <div class="pill-group">
+                            <button type="button" id="btn-copy-quiet-note" class="btn btn-sm btn-primary">Copy Quiet Delivery Note</button>
+                            <button type="button" id="btn-log-dispatch" class="btn btn-sm btn-emerald">Log Dispatch</button>
+                            <button type="button" id="btn-reset-dispatch" class="btn btn-sm btn-rose">Reset</button>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Right Column: Manual College Zone Auto-Call Routing + Active Orders + Activity Log -->
+                <div class="col-stack">
+                    <!-- 4. Manual College Zone Auto-Call Routing -->
+                    <section class="card" aria-labelledby="college-section-title">
+                        <div class="card-header">
+                            <h2 class="card-title" id="college-section-title">Manual College Zone Auto-Call Routing</h2>
+                            <span class="badge badge-muted" id="college-zone-badge">Outside College Zone</span>
+                        </div>
+
+                        <p style="margin:0 0 12px;font-size:0.84rem;color:var(--text-secondary);">
+                            Select or place your College Zone (via presets, custom name/coords, Current GPS, or map tap). Entering the College Zone automatically activates call routing to your masked backup receiver (<strong style="color:#fbbf24;">Relay #DR-804</strong>) and reverts on exit.
+                        </p>
+
+                        <label class="field-label" for="input-college-name">College / Campus Location Name</label>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+                            <input type="text" id="input-college-name" class="input-field" style="flex:1 1 180px;" placeholder="e.g. Main Campus / Hostel Block B" />
+                            <button type="button" id="btn-gps-as-college" class="btn btn-sm btn-cyan">Use Current GPS</button>
+                        </div>
+
+                        <div class="pill-group" style="margin-bottom:10px;">
+                            <span style="align-self:center;font-size:0.78rem;color:var(--text-muted);font-weight:700;">College Zone Radius:</span>
+                            <button type="button" class="btn btn-sm" data-college-radius="150">150m</button>
+                            <button type="button" class="btn btn-sm is-active" data-college-radius="300">300m</button>
+                            <button type="button" class="btn btn-sm" data-college-radius="600">600m</button>
+                            <button type="button" class="btn btn-sm" data-college-radius="1000">1km</button>
+                        </div>
+
+                        <div class="pill-group" style="margin-bottom:12px;">
+                            <button type="button" id="btn-enter-college" class="btn btn-sm btn-amber">I Entered College Zone</button>
+                            <button type="button" id="btn-leave-college" class="btn btn-sm">Leave College Zone</button>
+                            <button type="button" id="btn-check-gps-now" class="btn btn-sm btn-emerald">Check My Live GPS</button>
+                        </div>
+
+                        <div class="toggle-row" style="margin-bottom:10px;">
+                            <div>
+                                <div class="toggle-title">Auto-Route Calls Inside College Zone</div>
+                                <div class="toggle-desc" id="college-relay-summary">Routes via Relay #DR-804 to Sam Roommate</div>
+                            </div>
+                            <button type="button" class="switch-btn" id="toggle-college-autoroute" role="switch" aria-checked="true" aria-label="Auto-Route Calls Inside College Zone"></button>
+                        </div>
+
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-title">Zero-Call / Quiet Mode at Home</div>
+                                <div class="toggle-desc">Keeps personal phone quiet unless College Zone backup routing triggers</div>
+                            </div>
+                            <button type="button" class="switch-btn" id="toggle-quiet-home" role="switch" aria-checked="true" aria-label="Zero-Call Quiet Mode at Home"></button>
+                        </div>
+                    </section>
+
+                    <!-- Active Orders Card -->
+                    <section class="card" aria-labelledby="orders-section-title">
+                        <div class="card-header">
+                            <h2 class="card-title" id="orders-section-title">Your Active Orders</h2>
+                            <button type="button" id="btn-card-find-order" class="btn btn-sm btn-primary">+ Find Order</button>
+                        </div>
+
+                        <div class="order-list" id="active-orders-list"></div>
+
+                        <div id="selected-order-detail" style="margin-top:12px;padding:12px;border-radius:var(--radius-md);background:var(--bg-surface-muted);border:1px solid var(--border-subtle);">
+                            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+                                <span class="badge badge-cyan" id="detail-platform">Swiggy Instamart</span>
+                                <span class="mono-readout" id="detail-order-code" style="padding:3px 8px;font-size:0.78rem;">ORD-IM-88412</span>
+                            </div>
+                            <div style="margin-top:8px;font-weight:700;color:#ffffff;" id="detail-item-name">Fresh Groceries, Milk &amp; Snacks</div>
+                            <div style="margin-top:4px;font-size:0.8rem;color:var(--text-secondary);" id="detail-rider-info">Rider: Delivery Partner A • DL-01-AB-4412 • Personal Check PIN: 4927</div>
+                            <div style="margin-top:4px;font-size:0.74rem;color:var(--text-muted);">
+                                Visual handover PIN is a local check only and does not auto-enter OTPs into external apps.
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Activity Log Card -->
+                    <section class="card" aria-labelledby="log-section-title">
+                        <div class="card-header">
+                            <h2 class="card-title" id="log-section-title">Proximity, ETA &amp; Routing Activity Log</h2>
+                            <button type="button" id="btn-clear-log" class="btn btn-sm" style="min-height:48px;padding:6px 12px;font-size:0.8rem;">Clear</button>
+                        </div>
+                        <div class="log-list" id="activity-log-list"></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ==========================================================================
+         Backdrop, Searchable [ Find Your Order ] Modal & Right-Corner Profile Drawer
+         ========================================================================== -->
+    <div class="backdrop" id="ui-backdrop" aria-hidden="true"></div>
+
+    <!-- Searchable [ Find Your Order ] Modal -->
+    <div class="modal-card" id="find-order-modal" role="dialog" aria-modal="true" aria-labelledby="find-order-title">
+        <div class="card-header" style="margin-bottom:0;">
+            <h2 class="card-title" id="find-order-title">Find Your Order by Customer Order Number</h2>
+            <button type="button" id="btn-close-find-order" class="btn btn-sm">Close ✕</button>
+        </div>
+
+        <p style="margin:0;font-size:0.84rem;color:var(--text-secondary);">
+            Choose any quick-commerce, food, shopping, or courier platform and enter your Customer Order Number (plus optional ETA/status note) to monitor it on DropRadar.
+        </p>
+
+        <input type="search" id="input-platform-search" class="input-field" placeholder="Search app or courier (Swiggy Instamart, Zomato, Swiggy, Blinkit, Zepto, BigBasket, Amazon, Flipkart, Myntra, Ajio, Nykaa, Meesho, Delhivery, BlueDart, DTDC, Ecom Express)..." />
+
+        <div class="platform-grid" id="platform-chip-grid"></div>
+
+        <div>
+            <label class="field-label" for="input-customer-order-number">Customer Order Number</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                <input type="text" id="input-customer-order-number" class="input-field" style="flex:1 1 200px;" placeholder="Enter Customer Order Number (e.g. ORD-IM-90418)" />
+                <input type="text" id="input-order-eta-status" class="input-field" style="flex:1 1 160px;" placeholder="Optional ETA / status (e.g. ETA 12 mins)" />
+            </div>
+            <button type="button" id="btn-confirm-order-number" class="btn btn-primary" style="width:100%;">Track Order &amp; Log Status</button>
+        </div>
+
+        <div>
+            <span class="field-label">Quick Sample Order Numbers</span>
+            <div class="pill-group">
+                <button type="button" class="btn btn-sm" data-sample-order="Swiggy Instamart|ORD-IM-90418|Instant Grocery Basket|ETA 10 mins">Instamart: ORD-IM-90418</button>
+                <button type="button" class="btn btn-sm" data-sample-order="Amazon|408-7731920-4410291|Wireless Headphones|Out for Delivery">Amazon: 408-7731920-4410291</button>
+                <button type="button" class="btn btn-sm" data-sample-order="Flipkart|OD3319482019482000|Running Shoes|Arriving Today">Flipkart: OD3319482019482000</button>
+                <button type="button" class="btn btn-sm" data-sample-order="Blinkit|BLK-552109|Dairy &amp; Fruits|ETA 8 mins">Blinkit: BLK-552109</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right-Corner Profile Drawer -->
+    <aside class="drawer-right" id="profile-drawer" role="dialog" aria-modal="true" aria-labelledby="profile-drawer-title">
+        <div class="card-header" style="margin-bottom:0;">
+            <h2 class="card-title" id="profile-drawer-title">Customer Profile &amp; Backup</h2>
+            <button type="button" id="btn-close-profile-drawer" class="btn btn-sm">Close ✕</button>
+        </div>
+
+        <!-- Customer Profile Section -->
+        <div class="coord-box">
+            <strong style="font-size:0.9rem;color:#ffffff;">Customer Profile</strong>
+            <label class="field-label" for="input-profile-name" style="margin-bottom:2px;">Your Name</label>
+            <input type="text" id="input-profile-name" class="input-field" placeholder="e.g. Alex Student" />
+
+            <label class="field-label" for="select-living-mode" style="margin-bottom:2px;">Student / Living Status</label>
+            <select id="select-living-mode" class="select-field">
+                <option value="Day Scholar">Day Scholar</option>
+                <option value="Hosteller">Hosteller</option>
+                <option value="PG / Shared Room">PG / Shared Room</option>
+                <option value="Working / Home">Working / Home</option>
+            </select>
+            <button type="button" id="btn-save-profile" class="btn btn-sm btn-emerald">Save Profile</button>
+        </div>
+
+        <!-- Alternate Number Section with Two-Way Privacy Masking -->
+        <div class="coord-box" style="border-color:rgba(251, 191, 36, 0.45);">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <strong style="font-size:0.9rem;color:#fbbf24;">Alternate Number (Backup Receiver)</strong>
+                <span class="badge badge-amber">Relay #DR-804</span>
+            </div>
+
+            <label class="field-label" for="input-alt-name" style="margin-bottom:2px;">Backup Contact Name &amp; Role</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <input type="text" id="input-alt-name" class="input-field" placeholder="Backup Contact" />
+                <input type="text" id="input-alt-role" class="input-field" placeholder="Role (e.g. Roommate)" />
+            </div>
+
+            <label class="field-label" for="input-alt-phone" style="margin-bottom:2px;">Editable Real Phone Number</label>
+            <input type="tel" id="input-alt-phone" class="input-field" placeholder="+91 90000 04821" />
+
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;padding-top:4px;">
+                <div>
+                    <div style="font-size:0.74rem;color:var(--text-muted);">Two-Way Masked Number</div>
+                    <div class="mono-readout" id="drawer-masked-phone" style="padding:4px 8px;margin-top:2px;">+91-XXXX-XX-4821</div>
+                </div>
+                <div class="pill-group">
+                    <button type="button" id="btn-drawer-mask-toggle" class="btn btn-sm">Show Real</button>
+                    <a id="drawer-tel-link" href="tel:+919000004821" class="btn btn-sm btn-emerald">Dial Backup</a>
+                </div>
+            </div>
+            <button type="button" id="btn-save-alternate" class="btn btn-sm btn-amber">Save Alternate Number</button>
+        </div>
+
+        <!-- Past Orders History Section -->
+        <div class="coord-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <strong style="font-size:0.9rem;color:#ffffff;">Past Orders History</strong>
+                <span class="badge badge-muted" id="past-orders-count">0 orders</span>
+            </div>
+            <div id="past-orders-list" class="order-list"></div>
+        </div>
+    </aside>
+
+    <div class="toast-banner" id="toast-banner" role="status" aria-live="polite"></div>
+
+    <script>
+        /* ==========================================================================
+           DropRadar Field Edition — Complete Self-Contained Application Logic
+           Zero external dependencies; works 100% offline or on GitHub Pages.
+           ========================================================================== */
+        (function () {
+            "use strict";
+
+            var STORAGE_KEY = "dropradar_field_edition_generic_v2";
+
+            var SUPPORTED_PLATFORMS = [
+                { name: "Swiggy Instamart", category: "Quick Commerce" },
+                { name: "Zomato", category: "Food Delivery" },
+                { name: "Swiggy", category: "Food & Grocery" },
+                { name: "Blinkit", category: "Quick Commerce" },
+                { name: "Zepto", category: "Quick Commerce" },
+                { name: "BigBasket", category: "Grocery" },
+                { name: "Amazon", category: "Shopping" },
+                { name: "Flipkart", category: "Shopping" },
+                { name: "Myntra", category: "Fashion" },
+                { name: "Ajio", category: "Fashion" },
+                { name: "Nykaa", category: "Beauty & Care" },
+                { name: "Meesho", category: "Shopping" },
+                { name: "Delhivery", category: "Courier" },
+                { name: "BlueDart", category: "Courier" },
+                { name: "DTDC", category: "Courier" },
+                { name: "Ecom Express", category: "Courier" }
+            ];
+
+            var LOCATION_PRESETS = {
+                "main-residence": {
+                    homeLat: 28.6139,
+                    homeLng: 77.2090,
+                    collegeLat: 28.6289,
+                    collegeLng: 77.2150,
+                    riderLat: 28.6195,
+                    riderLng: 77.2128,
+                    label: "Main Residence"
+                },
+                "north-campus": {
+                    homeLat: 28.6139,
+                    homeLng: 77.2090,
+                    collegeLat: 28.6880,
+                    collegeLng: 77.2100,
+                    riderLat: 28.6182,
+                    riderLng: 77.2115,
+                    label: "North Campus"
+                },
+                "student-hostel": {
+                    homeLat: 28.6325,
+                    homeLng: 77.2195,
+                    collegeLat: 28.6289,
+                    collegeLng: 77.2150,
+                    riderLat: 28.6368,
+                    riderLng: 77.2225,
+                    label: "Student Hostel"
+                },
+                "tech-park-gate": {
+                    homeLat: 28.5355,
+                    homeLng: 77.3910,
+                    collegeLat: 28.5450,
+                    collegeLng: 77.3950,
+                    riderLat: 28.5402,
+                    riderLng: 77.3935,
+                    label: "Tech Park Gate"
+                }
+            };
+
+            function getDefaultState() {
+                return {
+                    largeText: false,
+                    layerMode: "satellite", // "satellite" | "radar" | "street"
+                    satLabelsGrid: true,
+                    clickMode: "home", // "home" | "college" | "drop"
+                    zoom: 1,
+                    panX: 0,
+                    panY: 0,
+                    home: {
+                        lat: 28.6139,
+                        lng: 77.2090,
+                        radius: 500
+                    },
+                    college: {
+                        name: "Main Campus / Hostel Block B",
+                        lat: 28.6289,
+                        lng: 77.2150,
+                        radius: 300,
+                        insideZone: false,
+                        autoRoute: true
+                    },
+                    rider: {
+                        lat: 28.6195,
+                        lng: 77.2128,
+                        wasInsideHome: false
+                    },
+                    liveGps: {
+                        watching: false,
+                        lat: null,
+                        lng: null,
+                        accuracy: null,
+                        statusText: "Standby — tap Live GPS Watch or Check My Live GPS"
+                    },
+                    dropPin: {
+                        source: "home", // "home" | "gps" | "custom"
+                        customLat: 28.61418,
+                        customLng: 77.20928,
+                        precision: "exact", // "exact" | "approx"
+                        autoSendOnEntry: true,
+                        logged: false,
+                        note: "No call during class/sleep — message or ring gate bell. Leave at front gate."
+                    },
+                    quietHomeMode: true,
+                    profile: {
+                        name: "Alex Student",
+                        livingMode: "Day Scholar"
+                    },
+                    alternate: {
+                        name: "Sam Roommate",
+                        role: "Roommate",
+                        phone: "+91 90000 04821",
+                        showReal: false
+                    },
+                    selectedPlatform: "Swiggy Instamart",
+                    selectedOrderId: "ord-1",
+                    activeOrders: [
+                        {
+                            id: "ord-1",
+                            platform: "Swiggy Instamart",
+                            orderNumber: "ORD-IM-88412",
+                            item: "Fresh Groceries, Milk & Snacks",
+                            etaStatus: "ETA 11 mins",
+                            riderName: "Delivery Partner A",
+                            vehicle: "DL-01-AB-4412",
+                            pin: "4927"
+                        },
+                        {
+                            id: "ord-2",
+                            platform: "Amazon",
+                            orderNumber: "408-9182734-5501928",
+                            item: "USB-C Fast Charger & Desk Stand",
+                            etaStatus: "Out for Delivery",
+                            riderName: "Delivery Partner B",
+                            vehicle: "DL-01-CD-8190",
+                            pin: "7314"
+                        }
+                    ],
+                    pastOrders: [
+                        {
+                            id: "past-1",
+                            platform: "Swiggy Instamart",
+                            orderNumber: "ORD-IM-77105",
+                            item: "Weekly Fruits, Bread & Curd",
+                            date: "Yesterday"
+                        },
+                        {
+                            id: "past-2",
+                            platform: "Flipkart",
+                            orderNumber: "OD3318290041209100",
+                            item: "Notebook Pack & Desk Lamp",
+                            date: "3 days ago"
+                        },
+                        {
+                            id: "past-3",
+                            platform: "Zomato",
+                            orderNumber: "ZMT-5509182",
+                            item: "Lunch Combo & Beverage",
+                            date: "5 days ago"
+                        }
+                    ],
+                    logs: [
+                        {
+                            time: "Ready",
+                            text: "DropRadar Field Edition (index.html) initialized with generic default coordinates and local persistence."
+                        }
+                    ]
+                };
+            }
+
+            var state = getDefaultState();
+            var gpsWatchId = null;
+            var toastTimer = null;
+            var radarAnimFrame = null;
+            var resizeObserverInstance = null;
+
+            function showErrorBoundary(err) {
+                try {
+                    var panel = document.getElementById("error-boundary-panel");
+                    var details = document.getElementById("error-boundary-details");
+                    if (details) {
+                        details.textContent = err && err.stack ? err.stack : String(err || "Unknown runtime error");
+                    }
+                    if (panel) {
+                        panel.classList.add("is-visible");
+                    }
+                } catch (_) {
+                    // Prevent cascading error display issues
+                }
+            }
+
+            window.addEventListener("error", function (event) {
+                if (event && event.error) {
+                    showErrorBoundary(event.error);
+                }
+            });
+
+            window.addEventListener("unhandledrejection", function (event) {
+                showErrorBoundary(event && event.reason ? event.reason : "Unhandled promise rejection");
+            });
+
+            function nowTimeLabel() {
+                var d = new Date();
+                var hh = String(d.getHours()).padStart(2, "0");
+                var mm = String(d.getMinutes()).padStart(2, "0");
+                var ss = String(d.getSeconds()).padStart(2, "0");
+                return hh + ":" + mm + ":" + ss;
+            }
+
+            function addLog(message) {
+                state.logs.unshift({
+                    time: nowTimeLabel(),
+                    text: message
+                });
+                if (state.logs.length > 40) {
+                    state.logs.length = 40;
+                }
+            }
+
+            function showToast(msg) {
+                var el = document.getElementById("toast-banner");
+                if (!el) return;
+                el.textContent = msg;
+                el.classList.add("is-visible");
+                if (toastTimer) clearTimeout(toastTimer);
+                toastTimer = setTimeout(function () {
+                    el.classList.remove("is-visible");
+                }, 2800);
+            }
+
+            function saveState() {
+                try {
+                    var copy = Object.assign({}, state);
+                    copy.liveGps = Object.assign({}, state.liveGps, { watching: false });
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(copy));
+                } catch (_) {
+                    // Ignore storage quota or private browsing errors
+                }
+            }
+
+            function loadState() {
+                try {
+                    var raw = localStorage.getItem(STORAGE_KEY);
+                    if (!raw) return;
+                    var parsed = JSON.parse(raw);
+                    if (!parsed || typeof parsed !== "object") return;
+                    var def = getDefaultState();
+                    state = Object.assign({}, def, parsed);
+                    state.home = Object.assign({}, def.home, parsed.home || {});
+                    state.college = Object.assign({}, def.college, parsed.college || {});
+                    state.rider = Object.assign({}, def.rider, parsed.rider || {});
+                    state.liveGps = Object.assign({}, def.liveGps, parsed.liveGps || {}, { watching: false });
+                    state.dropPin = Object.assign({}, def.dropPin, parsed.dropPin || {});
+                    state.profile = Object.assign({}, def.profile, parsed.profile || {});
+                    state.alternate = Object.assign({}, def.alternate, parsed.alternate || {});
+                    if (!Array.isArray(state.activeOrders) || state.activeOrders.length === 0) {
+                        state.activeOrders = def.activeOrders;
+                    }
+                    if (!Array.isArray(state.pastOrders)) {
+                        state.pastOrders = def.pastOrders;
+                    }
+                    if (!Array.isArray(state.logs)) {
+                        state.logs = def.logs;
+                    }
+                } catch (_) {
+                    state = getDefaultState();
+                }
+            }
+
+            function formatDecimal(num) {
+                var n = Number(num);
+                return isFinite(n) ? n.toFixed(6) : "0.000000";
+            }
+
+            function toDmsString(lat, lng) {
+                function convert(val, posDir, negDir) {
+                    var num = Number(val);
+                    if (!isFinite(num)) return "00°00'00.0\"" + posDir;
+                    var dir = num >= 0 ? posDir : negDir;
+                    var abs = Math.abs(num);
+                    var deg = Math.floor(abs);
+                    var minFloat = (abs - deg) * 60;
+                    var min = Math.floor(minFloat);
+                    var sec = ((minFloat - min) * 60).toFixed(1);
+                    return (
+                        String(deg).padStart(2, "0") +
+                        "°" +
+                        String(min).padStart(2, "0") +
+                        "'" +
+                        String(sec).padStart(4, "0") +
+                        "\"" +
+                        dir
+                    );
+                }
+                return convert(lat, "N", "S") + " " + convert(lng, "E", "W");
+            }
+
+            function maskPhone(phoneStr) {
+                var digits = String(phoneStr || "").replace(/\D/g, "");
+                if (digits.length < 4) return "+91-XXXX-XX-4821";
+                var last4 = digits.slice(-4);
+                return "+91-XXXX-XX-" + last4;
+            }
+
+            function toTelHref(phoneStr) {
+                var cleaned = String(phoneStr || "").replace(/[^\d+]/g, "");
+                return cleaned ? "tel:" + cleaned : "tel:+919000004821";
+            }
+
+            function computeDistanceMeters(lat1, lng1, lat2, lng2) {
+                var toRad = function (deg) {
+                    return (deg * Math.PI) / 180;
+                };
+                var R = 6371000;
+                var dLat = toRad(lat2 - lat1);
+                var dLng = toRad(lng2 - lng1);
+                var a =
+                    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(toRad(lat1)) *
+                        Math.cos(toRad(lat2)) *
+                        Math.sin(dLng / 2) *
+                        Math.sin(dLng / 2);
+                var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                return Math.round(R * c);
+            }
+
+            function copyToClipboard(text, label) {
+                var val = String(text || "");
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(val).then(
+                        function () {
+                            showToast("Copied " + label);
+                        },
+                        function () {
+                            execCopyFallback(val, label);
+                        }
+                    );
+                } else {
+                    execCopyFallback(val, label);
+                }
+            }
+
+            function execCopyFallback(val, label) {
+                try {
+                    var ta = document.createElement("textarea");
+                    ta.value = val;
+                    ta.setAttribute("readonly", "");
+                    ta.style.position = "fixed";
+                    ta.style.opacity = "0";
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(ta);
+                    showToast("Copied " + label);
+                } catch (_) {
+                    showToast("Ready: " + val.slice(0, 36));
+                }
+            }
+
+            function isCallAutoRouted() {
+                return Boolean(state.college.insideZone && state.college.autoRoute);
+            }
+
+            function getActiveDropCoords() {
+                if (state.dropPin.source === "gps") {
+                    if (typeof state.liveGps.lat === "number" && typeof state.liveGps.lng === "number") {
+                        return { lat: state.liveGps.lat, lng: state.liveGps.lng, label: "Current Live GPS" };
+                    }
+                    return { lat: state.home.lat, lng: state.home.lng, label: "Live GPS (Fallback Home)" };
+                }
+                if (state.dropPin.source === "custom") {
+                    return { lat: state.dropPin.customLat, lng: state.dropPin.customLng, label: "Custom Drop Spot" };
+                }
+                return { lat: state.home.lat, lng: state.home.lng, label: "Saved Home Pin" };
+            }
+
+            function buildGoogleMapsUrl(lat, lng) {
+                return "https://www.google.com/maps?q=" + formatDecimal(lat) + "," + formatDecimal(lng);
+            }
+
+            function buildOpenStreetMapUrl(lat, lng) {
+                var fLat = formatDecimal(lat);
+                var fLng = formatDecimal(lng);
+                return "https://www.openstreetmap.org/?mlat=" + fLat + "&mlon=" + fLng + "#map=17/" + fLat + "/" + fLng;
+            }
+
+            function getSelectedOrder() {
+                var found = state.activeOrders.find(function (o) {
+                    return o.id === state.selectedOrderId;
+                });
+                return found || state.activeOrders[0] || null;
+            }
+
+            function buildQuietPayloadText() {
+                var coords = getActiveDropCoords();
+                var exact = state.dropPin.precision === "exact";
+                var latDisplay = exact ? formatDecimal(coords.lat) : Number(coords.lat).toFixed(4) + "xx";
+                var lngDisplay = exact ? formatDecimal(coords.lng) : Number(coords.lng).toFixed(4) + "xx";
+                var ord = getSelectedOrder();
+                var routed = isCallAutoRouted();
+
+                return [
+                    "[DropRadar Quiet Delivery Note]",
+                    "Order: " + (ord ? ord.platform + " #" + ord.orderNumber + (ord.etaStatus ? " (" + ord.etaStatus + ")" : "") : "Customer Package"),
+                    "Drop Pin (" + coords.label + "): " + latDisplay + ", " + lngDisplay + (exact ? "" : " (~50m zone)"),
+                    "Google Maps: " + buildGoogleMapsUrl(coords.lat, coords.lng),
+                    "OpenStreetMap: " + buildOpenStreetMapUrl(coords.lat, coords.lng),
+                    "Quiet Instruction: " + (state.dropPin.note || "No call during class/sleep — message or ring gate bell."),
+                    "Call Routing: " +
+                        (routed
+                            ? "AUTO-ROUTED via Relay #DR-804 to " + state.alternate.name + " (" + state.alternate.role + ")"
+                            : state.quietHomeMode
+                            ? "Quiet Shield Active (Relay #DR-804 on standby)"
+                            : "Standard")
+                ].join("\n");
+            }
+
+            function evaluateGeofenceTransitions() {
+                var dist = computeDistanceMeters(state.home.lat, state.home.lng, state.rider.lat, state.rider.lng);
+                var insideNow = dist <= state.home.radius;
+                if (insideNow && !state.rider.wasInsideHome) {
+                    state.rider.wasInsideHome = true;
+                    addLog(
+                        "GEOFENCE ALERT: Driver entered " +
+                            state.home.radius +
+                            "m Home Zone (" +
+                            dist +
+                            "m away). Quiet shield kept calls muted."
+                    );
+                    if (state.dropPin.autoSendOnEntry) {
+                        state.dropPin.logged = true;
+                        addLog("Auto-prepared Quiet Delivery Note & dispatch payload on Home Zone entry.");
+                    }
+                    showToast("Driver entered Home Zone (" + dist + "m)");
+                } else if (!insideNow && state.rider.wasInsideHome) {
+                    state.rider.wasInsideHome = false;
+                }
+                return { distanceMeters: dist, insideHome: insideNow };
+            }
+
+            function setCollegeZoneState(entered, triggerSource) {
+                var wasInside = Boolean(state.college.insideZone);
+                state.college.insideZone = Boolean(entered);
+                if (entered && !wasInside) {
+                    if (state.college.autoRoute) {
+                        addLog(
+                            "ENTERED COLLEGE ZONE (" +
+                                state.college.name +
+                                " via " +
+                                triggerSource +
+                                "). Calls AUTO-ROUTED via Relay #DR-804 to " +
+                                state.alternate.name +
+                                " (" +
+                                maskPhone(state.alternate.phone) +
+                                ")."
+                        );
+                        showToast("Entered College Zone — calls routed to " + state.alternate.name);
+                    } else {
+                        addLog("Entered College Zone (" + state.college.name + "); auto-routing toggle is OFF.");
+                        showToast("Entered College Zone");
+                    }
+                } else if (!entered && wasInside) {
+                    addLog("EXITED COLLEGE ZONE (" + state.college.name + "). Reverted to personal quiet shield.");
+                    showToast("Left College Zone — call routing reverted");
+                }
+            }
+
+            function applyLiveGpsCoords(lat, lng, accuracy, sourceLabel) {
+                var cleanLat = Number(Number(lat).toFixed(6));
+                var cleanLng = Number(Number(lng).toFixed(6));
+                var acc = typeof accuracy === "number" && isFinite(accuracy) ? Math.round(accuracy) : null;
+                state.liveGps.lat = cleanLat;
+                state.liveGps.lng = cleanLng;
+                state.liveGps.accuracy = acc;
+                state.liveGps.statusText =
+                    cleanLat +
+                    ", " +
+                    cleanLng +
+                    (acc !== null ? " (±" + acc + "m accuracy)" : "") +
+                    " • " +
+                    sourceLabel;
+
+                var distToCollege = computeDistanceMeters(cleanLat, cleanLng, state.college.lat, state.college.lng);
+                if (distToCollege <= state.college.radius && !state.college.insideZone) {
+                    setCollegeZoneState(true, "Live GPS " + distToCollege + "m");
+                } else if (distToCollege > state.college.radius && state.college.insideZone && sourceLabel === "GPS Watch") {
+                    setCollegeZoneState(false, "Live GPS " + distToCollege + "m");
+                }
+            }
+
+            function toggleLiveGpsWatch(enable) {
+                var btn = document.getElementById("btn-watch-gps");
+                if (!enable) {
+                    if (gpsWatchId !== null && navigator.geolocation && navigator.geolocation.clearWatch) {
+                        try {
+                            navigator.geolocation.clearWatch(gpsWatchId);
+                        } catch (_) {}
+                        gpsWatchId = null;
+                    }
+                    state.liveGps.watching = false;
+                    if (btn) {
+                        btn.textContent = "Live GPS Watch: OFF";
+                        btn.setAttribute("aria-pressed", "false");
+                        btn.classList.remove("is-active");
+                    }
+                    addLog("Stopped Live GPS Watch.");
+                    saveState();
+                    renderAll();
+                    return;
+                }
+
+                if (!navigator.geolocation || !navigator.geolocation.watchPosition) {
+                    state.liveGps.statusText = "Geolocation API unavailable — use manual Lat/Lng or zone buttons";
+                    showToast("Geolocation unavailable on this browser");
+                    renderDropPinPanel();
+                    return;
+                }
+
+                state.liveGps.watching = true;
+                state.liveGps.statusText = "Requesting device GPS permission...";
+                if (btn) {
+                    btn.textContent = "Live GPS Watch: ON";
+                    btn.setAttribute("aria-pressed", "true");
+                    btn.classList.add("is-active");
+                }
+                renderDropPinPanel();
+
+                try {
+                    gpsWatchId = navigator.geolocation.watchPosition(
+                        function (pos) {
+                            applyLiveGpsCoords(
+                                pos.coords.latitude,
+                                pos.coords.longitude,
+                                pos.coords.accuracy,
+                                "GPS Watch"
+                            );
+                            saveState();
+                            renderAll();
+                        },
+                        function (err) {
+                            state.liveGps.watching = false;
+                            gpsWatchId = null;
+                            if (btn) {
+                                btn.textContent = "Live GPS Watch: OFF";
+                                btn.setAttribute("aria-pressed", "false");
+                                btn.classList.remove("is-active");
+                            }
+                            var reason =
+                                err && err.code === 1
+                                    ? "GPS permission denied — fallback to manual coordinates"
+                                    : "GPS signal unavailable — fallback to manual coordinates";
+                            state.liveGps.statusText = reason;
+                            addLog(reason);
+                            showToast(reason);
+                            saveState();
+                            renderAll();
+                        },
+                        { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+                    );
+                } catch (_) {
+                    state.liveGps.watching = false;
+                    state.liveGps.statusText = "GPS watch error — using manual coordinates";
+                    renderDropPinPanel();
+                }
+            }
+
+            /* ======================================================================
+               High-DPI Canvas Satellite, Radar & Street View Renderer (Never Blank)
+               ====================================================================== */
+            function getCanvasContext() {
+                var viewport = document.getElementById("map-viewport");
+                var canvas = document.getElementById("radar-canvas");
+                if (!canvas) return null;
+
+                var rect = viewport ? viewport.getBoundingClientRect() : { width: 640, height: 360 };
+                var cssWidth = Math.max(300, Math.round(rect.width || canvas.clientWidth || 640));
+                var cssHeight = Math.max(320, Math.round(rect.height || canvas.clientHeight || 360));
+                var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+                if (canvas.width !== Math.round(cssWidth * dpr) || canvas.height !== Math.round(cssHeight * dpr)) {
+                    canvas.width = Math.round(cssWidth * dpr);
+                    canvas.height = Math.round(cssHeight * dpr);
+                }
+
+                var ctx = canvas.getContext("2d");
+                if (!ctx) return null;
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                return { ctx: ctx, w: cssWidth, h: cssHeight };
+            }
+
+            function latLngToScreen(lat, lng, w, h) {
+                var metersPerLat = 111320;
+                var metersPerLng = 111320 * Math.cos((state.home.lat * Math.PI) / 180);
+                var baseScale = Math.min(w, h) / 2400;
+                var scale = baseScale * (state.zoom || 1);
+
+                var dxMeters = (lng - state.home.lng) * metersPerLng;
+                var dyMeters = (state.home.lat - lat) * metersPerLat;
+
+                return {
+                    x: w * 0.5 + (state.panX || 0) + dxMeters * scale,
+                    y: h * 0.5 + (state.panY || 0) + dyMeters * scale,
+                    metersPerPixel: 1 / Math.max(scale, 0.0001)
+                };
+            }
+
+            function screenToLatLng(px, py, w, h) {
+                var metersPerLat = 111320;
+                var metersPerLng = 111320 * Math.cos((state.home.lat * Math.PI) / 180);
+                var baseScale = Math.min(w, h) / 2400;
+                var scale = baseScale * (state.zoom || 1);
+
+                var dxMeters = (px - (w * 0.5 + (state.panX || 0))) / scale;
+                var dyMeters = (py - (h * 0.5 + (state.panY || 0))) / scale;
+
+                return {
+                    lat: Number((state.home.lat - dyMeters / metersPerLat).toFixed(6)),
+                    lng: Number((state.home.lng + dxMeters / metersPerLng).toFixed(6))
+                };
+            }
+
+            function drawFallbackCanvas(ctx, w, h) {
+                ctx.fillStyle = "#12261c";
+                ctx.fillRect(0, 0, w, h);
+                ctx.strokeStyle = "rgba(52, 211, 153, 0.25)";
+                ctx.lineWidth = 1;
+                for (var x = 0; x < w; x += 36) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, h);
+                    ctx.stroke();
+                }
+                for (var y = 0; y < h; y += 36) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(w, y);
+                    ctx.stroke();
+                }
+                ctx.beginPath();
+                ctx.arc(w * 0.5, h * 0.5, Math.min(w, h) * 0.28, 0, Math.PI * 2);
+                ctx.strokeStyle = "#34d399";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = "#ecfdf5";
+                ctx.font = "bold 13px system-ui, sans-serif";
+                ctx.fillText("DropRadar Geofence (" + formatDecimal(state.home.lat) + ", " + formatDecimal(state.home.lng) + ")", 14, h - 16);
+            }
+
+            function drawPinMarker(ctx, x, y, color, label, showLabel) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(x, y, 9, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.lineWidth = 2.5;
+                ctx.strokeStyle = "#060b16";
+                ctx.stroke();
+
+                if (label && showLabel) {
+                    ctx.font = "bold 11px system-ui, sans-serif";
+                    var tw = ctx.measureText(label).width;
+                    var maxW = (ctx.canvas.clientWidth || 640) - tw - 18;
+                    var bx = Math.min(Math.max(8, x - tw / 2 - 6), Math.max(8, maxW));
+                    var by = Math.max(44, y - 26);
+                    ctx.fillStyle = "rgba(6, 11, 22, 0.9)";
+                    ctx.fillRect(bx, by, tw + 12, 18);
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect(bx, by, tw + 12, 18);
+                    ctx.fillStyle = "#f8fafc";
+                    ctx.fillText(label, bx + 6, by + 13);
+                }
+                ctx.restore();
+            }
+
+            function renderMapFrame(timeMs) {
+                var pack = getCanvasContext();
+                if (!pack) return;
+                var ctx = pack.ctx;
+                var w = pack.w;
+                var h = pack.h;
+
+                try {
+                    if (state.layerMode === "satellite") {
+                        // Overhead satellite terrain base
+                        var grad = ctx.createLinearGradient(0, 0, w, h);
+                        grad.addColorStop(0, "#182d22");
+                        grad.addColorStop(0.5, "#1f3425");
+                        grad.addColorStop(1, "#14242d");
+                        ctx.fillStyle = grad;
+                        ctx.fillRect(0, 0, w, h);
+
+                        // Green tree canopies & vegetation patches
+                        ctx.fillStyle = "rgba(28, 96, 56, 0.42)";
+                        ctx.beginPath();
+                        ctx.ellipse(w * 0.2, h * 0.28, w * 0.16, h * 0.14, 0.25, 0, Math.PI * 2);
+                        ctx.ellipse(w * 0.8, h * 0.72, w * 0.19, h * 0.15, -0.25, 0, Math.PI * 2);
+                        ctx.ellipse(w * 0.74, h * 0.24, w * 0.12, h * 0.1, 0.1, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // River / irrigation water channel
+                        ctx.strokeStyle = "rgba(14, 116, 144, 0.5)";
+                        ctx.lineWidth = 15;
+                        ctx.beginPath();
+                        ctx.moveTo(0, h * 0.82);
+                        ctx.bezierCurveTo(w * 0.35, h * 0.64, w * 0.62, h * 0.9, w, h * 0.56);
+                        ctx.stroke();
+
+                        // Building rooftops
+                        for (var gx = 24; gx < w - 24; gx += 66) {
+                            for (var gy = 24; gy < h - 24; gy += 62) {
+                                if (((gx + gy) / 4) % 3 === 0) continue;
+                                ctx.fillStyle = "rgba(148, 163, 184, 0.16)";
+                                ctx.fillRect(gx, gy, 34, 22);
+                                ctx.strokeStyle = "rgba(226, 232, 240, 0.14)";
+                                ctx.lineWidth = 1;
+                                ctx.strokeRect(gx, gy, 34, 22);
+                            }
+                        }
+
+                        // Arterial roads
+                        ctx.strokeStyle = "rgba(203, 213, 225, 0.25)";
+                        ctx.lineWidth = 4;
+                        ctx.beginPath();
+                        ctx.moveTo(0, h * 0.5);
+                        ctx.lineTo(w, h * 0.5);
+                        ctx.moveTo(w * 0.5, 0);
+                        ctx.lineTo(w * 0.5, h);
+                        ctx.stroke();
+
+                        // Optional satellite grid overlay
+                        if (state.satLabelsGrid) {
+                            ctx.strokeStyle = "rgba(52, 211, 153, 0.1)";
+                            ctx.lineWidth = 1;
+                            for (var sx = 0; sx < w; sx += 44) {
+                                ctx.beginPath();
+                                ctx.moveTo(sx, 0);
+                                ctx.lineTo(sx, h);
+                                ctx.stroke();
+                            }
+                            for (var sy = 0; sy < h; sy += 44) {
+                                ctx.beginPath();
+                                ctx.moveTo(0, sy);
+                                ctx.lineTo(w, sy);
+                                ctx.stroke();
+                            }
+                        }
+                    } else if (state.layerMode === "street") {
+                        // High-contrast dark street map view
+                        ctx.fillStyle = "#0e1726";
+                        ctx.fillRect(0, 0, w, h);
+
+                        // City blocks
+                        ctx.fillStyle = "#142034";
+                        for (var bx = 18; bx < w - 18; bx += 76) {
+                            for (var by = 18; by < h - 18; by += 68) {
+                                ctx.fillRect(bx, by, 54, 46);
+                            }
+                        }
+
+                        // Major avenues & lane markings
+                        ctx.strokeStyle = "#334155";
+                        ctx.lineWidth = 10;
+                        ctx.beginPath();
+                        ctx.moveTo(0, h * 0.5);
+                        ctx.lineTo(w, h * 0.5);
+                        ctx.moveTo(w * 0.5, 0);
+                        ctx.lineTo(w * 0.5, h);
+                        ctx.stroke();
+
+                        ctx.strokeStyle = "rgba(251, 191, 36, 0.45)";
+                        ctx.lineWidth = 1.5;
+                        ctx.setLineDash([8, 8]);
+                        ctx.beginPath();
+                        ctx.moveTo(0, h * 0.5);
+                        ctx.lineTo(w, h * 0.5);
+                        ctx.moveTo(w * 0.5, 0);
+                        ctx.lineTo(w * 0.5, h);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    } else {
+                        // Radar grid mode
+                        ctx.fillStyle = "#071122";
+                        ctx.fillRect(0, 0, w, h);
+
+                        ctx.strokeStyle = "rgba(34, 211, 238, 0.16)";
+                        ctx.lineWidth = 1;
+                        var step = 32;
+                        for (var rx = ((state.panX || 0) % step + step) % step; rx < w; rx += step) {
+                            ctx.beginPath();
+                            ctx.moveTo(rx, 0);
+                            ctx.lineTo(rx, h);
+                            ctx.stroke();
+                        }
+                        for (var ry = ((state.panY || 0) % step + step) % step; ry < h; ry += step) {
+                            ctx.beginPath();
+                            ctx.moveTo(0, ry);
+                            ctx.lineTo(w, ry);
+                            ctx.stroke();
+                        }
+                    }
+
+                    var showLabels = state.layerMode !== "satellite" || Boolean(state.satLabelsGrid);
+                    var homePt = latLngToScreen(state.home.lat, state.home.lng, w, h);
+                    var colPt = latLngToScreen(state.college.lat, state.college.lng, w, h);
+                    var riderPt = latLngToScreen(state.rider.lat, state.rider.lng, w, h);
+                    var dropCoords = getActiveDropCoords();
+                    var dropPt = latLngToScreen(dropCoords.lat, dropCoords.lng, w, h);
+
+                    var radiusPx = Math.max(20, state.home.radius / Math.max(homePt.metersPerPixel, 0.01));
+
+                    // Geofence Circle around Saved Home
+                    ctx.beginPath();
+                    ctx.arc(homePt.x, homePt.y, radiusPx, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(16, 185, 129, 0.15)";
+                    ctx.fill();
+                    ctx.lineWidth = 2.5;
+                    ctx.strokeStyle = "#34d399";
+                    ctx.stroke();
+
+                    // Rotating radar sweep inside Home Geofence
+                    var angle = ((timeMs || 0) * 0.0012) % (Math.PI * 2);
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(homePt.x, homePt.y);
+                    ctx.arc(homePt.x, homePt.y, radiusPx, angle - 0.35, angle);
+                    ctx.closePath();
+                    ctx.fillStyle = "rgba(52, 211, 153, 0.2)";
+                    ctx.fill();
+                    ctx.restore();
+
+                    // College geofence ring
+                    var colRadiusPx = Math.max(15, state.college.radius / Math.max(homePt.metersPerPixel, 0.01));
+                    ctx.beginPath();
+                    ctx.arc(colPt.x, colPt.y, colRadiusPx, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(245, 158, 11, 0.15)";
+                    ctx.fill();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = "#fbbf24";
+                    ctx.stroke();
+
+                    // Dashed vector line from Rider to Home
+                    ctx.beginPath();
+                    ctx.moveTo(riderPt.x, riderPt.y);
+                    ctx.lineTo(homePt.x, homePt.y);
+                    ctx.setLineDash([6, 5]);
+                    ctx.strokeStyle = "#22d3ee";
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    drawPinMarker(ctx, homePt.x, homePt.y, "#10b981", "HOME (" + state.home.radius + "m)", showLabels);
+                    drawPinMarker(ctx, colPt.x, colPt.y, "#f59e0b", "COLLEGE (" + state.college.radius + "m)", showLabels);
+                    drawPinMarker(ctx, riderPt.x, riderPt.y, "#22d3ee", "RIDER", showLabels);
+                    drawPinMarker(ctx, dropPt.x, dropPt.y + 14, "#818cf8", "DROP PIN", showLabels);
+
+                    if (typeof state.liveGps.lat === "number" && typeof state.liveGps.lng === "number") {
+                        var gpsPt = latLngToScreen(state.liveGps.lat, state.liveGps.lng, w, h);
+                        drawPinMarker(ctx, gpsPt.x, gpsPt.y - 14, "#38bdf8", "MY GPS", showLabels);
+                    }
+                } catch (_) {
+                    drawFallbackCanvas(ctx, w, h);
+                }
+            }
+
+            function startRadarLoop() {
+                if (radarAnimFrame) cancelAnimationFrame(radarAnimFrame);
+                function tick(ts) {
+                    renderMapFrame(ts);
+                    radarAnimFrame = requestAnimationFrame(tick);
+                }
+                radarAnimFrame = requestAnimationFrame(tick);
+            }
+
+            /* ======================================================================
+               UI Rendering Functions
+               ====================================================================== */
+            function renderHeaderAndStats(geoInfo) {
+                document.documentElement.classList.toggle("large-text", Boolean(state.largeText));
+                var ltBtn = document.getElementById("btn-toggle-large-text");
+                if (ltBtn) {
+                    ltBtn.setAttribute("aria-pressed", String(Boolean(state.largeText)));
+                    ltBtn.classList.toggle("is-active", Boolean(state.largeText));
+                }
+
+                var gmapsHeaderLink = document.getElementById("btn-header-gmaps");
+                if (gmapsHeaderLink) {
+                    gmapsHeaderLink.href = buildGoogleMapsUrl(state.home.lat, state.home.lng);
+                }
+
+                var geoTile = document.getElementById("tile-geofence");
+                var geoVal = document.getElementById("stat-geofence-value");
+                var geoSub = document.getElementById("stat-geofence-sub");
+                var hudDist = document.getElementById("hud-dist-pill");
+
+                if (geoInfo.insideHome) {
+                    geoTile.className = "stat-tile is-alert";
+                    geoVal.textContent = "Driver Inside Home Zone";
+                    geoSub.textContent = geoInfo.distanceMeters + "m from Home (" + state.home.radius + "m perimeter)";
+                } else {
+                    geoTile.className = "stat-tile";
+                    geoVal.textContent = "Driver Approaching";
+                    geoSub.textContent = geoInfo.distanceMeters + "m away • Alert at " + state.home.radius + "m";
+                }
+                if (hudDist) {
+                    hudDist.textContent = "Rider: " + geoInfo.distanceMeters + "m • Alert: " + state.home.radius + "m";
+                }
+
+                var routeTile = document.getElementById("tile-routing");
+                var routeVal = document.getElementById("stat-routing-value");
+                var routeSub = document.getElementById("stat-routing-sub");
+                if (isCallAutoRouted()) {
+                    routeTile.className = "stat-tile is-routed";
+                    routeVal.textContent = "Auto-Routed to Backup";
+                    routeSub.textContent = "Relay #DR-804 -> " + state.alternate.name + " (" + maskPhone(state.alternate.phone) + ")";
+                } else {
+                    routeTile.className = "stat-tile";
+                    routeVal.textContent = state.quietHomeMode ? "Quiet Shield Active" : "Standard Alerts";
+                    routeSub.textContent = "Backup: " + state.alternate.name + " (Relay #DR-804 standby)";
+                }
+
+                var ord = getSelectedOrder();
+                var ordVal = document.getElementById("stat-order-value");
+                var ordSub = document.getElementById("stat-order-sub");
+                if (ord) {
+                    ordVal.textContent = ord.platform;
+                    ordSub.textContent = "Order #" + ord.orderNumber + (ord.etaStatus ? " • " + ord.etaStatus : "");
+                }
+            }
+
+            function renderMapControls() {
+                document.querySelectorAll("[data-layer-mode]").forEach(function (btn) {
+                    btn.classList.toggle("is-active", btn.getAttribute("data-layer-mode") === state.layerMode);
+                });
+                var satLabelsBtn = document.getElementById("btn-toggle-sat-labels");
+                if (satLabelsBtn) {
+                    satLabelsBtn.classList.toggle("is-active", Boolean(state.satLabelsGrid));
+                    satLabelsBtn.setAttribute("aria-pressed", String(Boolean(state.satLabelsGrid)));
+                }
+                document.querySelectorAll("[data-click-mode]").forEach(function (btn) {
+                    btn.classList.toggle("is-active", btn.getAttribute("data-click-mode") === state.clickMode);
+                });
+                document.querySelectorAll("[data-radius]").forEach(function (btn) {
+                    btn.classList.toggle("is-active", Number(btn.getAttribute("data-radius")) === Number(state.home.radius));
+                });
+
+                var hudMode = document.getElementById("hud-mode-pill");
+                var modeLabel =
+                    state.layerMode === "satellite"
+                        ? "SATELLITE"
+                        : state.layerMode === "street"
+                        ? "STREET VIEW"
+                        : "RADAR GRID";
+                var pinTarget =
+                    state.clickMode === "college"
+                        ? "SET COLLEGE"
+                        : state.clickMode === "drop"
+                        ? "SET DROP PIN"
+                        : "SET HOME";
+                if (hudMode) {
+                    hudMode.textContent = modeLabel + " • CLICK MAP TO " + pinTarget;
+                }
+            }
+
+            function renderCoordinatesPanel() {
+                document.getElementById("readout-home-dec").textContent =
+                    formatDecimal(state.home.lat) + ", " + formatDecimal(state.home.lng);
+                document.getElementById("readout-home-dms").textContent = toDmsString(state.home.lat, state.home.lng);
+
+                document.getElementById("readout-college-dec").textContent =
+                    formatDecimal(state.college.lat) + ", " + formatDecimal(state.college.lng);
+                document.getElementById("readout-college-dms").textContent = toDmsString(state.college.lat, state.college.lng);
+
+                document.getElementById("readout-rider-dec").textContent =
+                    formatDecimal(state.rider.lat) + ", " + formatDecimal(state.rider.lng);
+                document.getElementById("readout-rider-dms").textContent = toDmsString(state.rider.lat, state.rider.lng);
+
+                var pairs = [
+                    ["input-home-lat", state.home.lat],
+                    ["input-home-lng", state.home.lng],
+                    ["input-college-lat", state.college.lat],
+                    ["input-college-lng", state.college.lng],
+                    ["input-rider-lat", state.rider.lat],
+                    ["input-rider-lng", state.rider.lng]
+                ];
+                pairs.forEach(function (p) {
+                    var el = document.getElementById(p[0]);
+                    if (el && document.activeElement !== el) {
+                        el.value = formatDecimal(p[1]);
+                    }
+                });
+            }
+
+            function renderCollegeAndRoutingPanel() {
+                var badge = document.getElementById("college-zone-badge");
+                if (state.college.insideZone) {
+                    badge.className = "badge badge-amber";
+                    badge.textContent = "Inside College Zone (" + state.college.radius + "m)";
+                } else {
+                    badge.className = "badge badge-muted";
+                    badge.textContent = "Outside College Zone";
+                }
+
+                document.querySelectorAll("[data-college-radius]").forEach(function (btn) {
+                    btn.classList.toggle("is-active", Number(btn.getAttribute("data-college-radius")) === Number(state.college.radius));
+                });
+
+                var nameInput = document.getElementById("input-college-name");
+                if (nameInput && document.activeElement !== nameInput) {
+                    nameInput.value = state.college.name || "";
+                }
+
+                document.getElementById("college-relay-summary").textContent =
+                    "Routes via Relay #DR-804 to " +
+                    state.alternate.name +
+                    " (" +
+                    state.alternate.role +
+                    " • " +
+                    maskPhone(state.alternate.phone) +
+                    ")";
+
+                document.getElementById("toggle-college-autoroute").setAttribute("aria-checked", String(Boolean(state.college.autoRoute)));
+                document.getElementById("toggle-quiet-home").setAttribute("aria-checked", String(Boolean(state.quietHomeMode)));
+            }
+
+            function renderDropPinPanel() {
+                document.querySelectorAll("[data-drop-source]").forEach(function (btn) {
+                    btn.classList.toggle("is-active", btn.getAttribute("data-drop-source") === state.dropPin.source);
+                });
+
+                document.getElementById("live-gps-readout").textContent = "Live Device GPS: " + state.liveGps.statusText;
+
+                var isExact = state.dropPin.precision === "exact";
+                var precBtn = document.getElementById("btn-toggle-precision");
+                precBtn.textContent = isExact ? "Exact Pin" : "~50m Approximate";
+                precBtn.classList.toggle("is-active", isExact);
+                document.getElementById("precision-desc").textContent = isExact
+                    ? "Exact 6-decimal coordinates"
+                    : "~50m Approximate Drop Circle";
+
+                document.getElementById("toggle-autosend-pin").setAttribute("aria-checked", String(Boolean(state.dropPin.autoSendOnEntry)));
+
+                var noteEl = document.getElementById("input-drop-note");
+                if (noteEl && document.activeElement !== noteEl) {
+                    noteEl.value = state.dropPin.note || "";
+                }
+
+                var badge = document.getElementById("droppin-status-badge");
+                if (state.dropPin.logged) {
+                    badge.className = "badge badge-emerald";
+                    badge.textContent = "Dispatch Logged";
+                } else {
+                    badge.className = "badge badge-muted";
+                    badge.textContent = "Ready to Share";
+                }
+
+                var coords = getActiveDropCoords();
+                document.getElementById("link-share-gmaps").href = buildGoogleMapsUrl(coords.lat, coords.lng);
+                document.getElementById("link-share-osm").href = buildOpenStreetMapUrl(coords.lat, coords.lng);
+                document.getElementById("driver-payload-box").textContent = buildQuietPayloadText();
+            }
+
+            function renderOrdersAndLogs() {
+                var listEl = document.getElementById("active-orders-list");
+                listEl.innerHTML = "";
+
+                state.activeOrders.forEach(function (ord) {
+                    var btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "order-item" + (ord.id === state.selectedOrderId ? " is-selected" : "");
+                    btn.innerHTML =
+                        "<div>" +
+                        "<div style='font-weight:800;color:#ffffff;font-size:0.9rem;'>" +
+                        escapeHtml(ord.platform) +
+                        " <span style='font-family:var(--font-mono);font-size:0.78rem;color:#22d3ee;'>#" +
+                        escapeHtml(ord.orderNumber) +
+                        "</span></div>" +
+                        "<div style='font-size:0.8rem;color:var(--text-secondary);margin-top:2px;'>" +
+                        escapeHtml(ord.item) +
+                        (ord.etaStatus ? " • " + escapeHtml(ord.etaStatus) : "") +
+                        "</div>" +
+                        "</div>" +
+                        "<span class='badge badge-emerald'>Track</span>";
+                    btn.addEventListener("click", function () {
+                        state.selectedOrderId = ord.id;
+                        saveState();
+                        renderAll();
+                        showToast("Tracking " + ord.platform + " #" + ord.orderNumber);
+                    });
+                    listEl.appendChild(btn);
+                });
+
+                var active = getSelectedOrder();
+                if (active) {
+                    document.getElementById("detail-platform").textContent = active.platform;
+                    document.getElementById("detail-order-code").textContent = active.orderNumber;
+                    document.getElementById("detail-item-name").textContent =
+                        active.item + (active.etaStatus ? " (" + active.etaStatus + ")" : "");
+                    document.getElementById("detail-rider-info").textContent =
+                        "Rider: " +
+                        active.riderName +
+                        " • " +
+                        active.vehicle +
+                        " • Personal Check PIN: " +
+                        active.pin;
+                }
+
+                var logEl = document.getElementById("activity-log-list");
+                logEl.innerHTML = "";
+                state.logs.forEach(function (entry) {
+                    var div = document.createElement("div");
+                    div.className = "log-entry";
+                    div.innerHTML = "<span class='log-time'>[" + escapeHtml(entry.time) + "]</span>" + escapeHtml(entry.text);
+                    logEl.appendChild(div);
+                });
+            }
+
+            function renderProfileDrawer() {
+                var nameInput = document.getElementById("input-profile-name");
+                if (nameInput && document.activeElement !== nameInput) {
+                    nameInput.value = state.profile.name || "";
+                }
+                var livingSelect = document.getElementById("select-living-mode");
+                if (livingSelect && document.activeElement !== livingSelect) {
+                    livingSelect.value = state.profile.livingMode || "Day Scholar";
+                }
+
+                var altName = document.getElementById("input-alt-name");
+                if (altName && document.activeElement !== altName) {
+                    altName.value = state.alternate.name || "";
+                }
+                var altRole = document.getElementById("input-alt-role");
+                if (altRole && document.activeElement !== altRole) {
+                    altRole.value = state.alternate.role || "";
+                }
+                var altPhone = document.getElementById("input-alt-phone");
+                if (altPhone && document.activeElement !== altPhone) {
+                    altPhone.value = state.alternate.phone || "";
+                }
+
+                document.getElementById("drawer-masked-phone").textContent = state.alternate.showReal
+                    ? state.alternate.phone
+                    : maskPhone(state.alternate.phone);
+                document.getElementById("btn-drawer-mask-toggle").textContent = state.alternate.showReal
+                    ? "Mask Number"
+                    : "Show Real";
+                document.getElementById("drawer-tel-link").href = toTelHref(state.alternate.phone);
+
+                document.getElementById("past-orders-count").textContent = state.pastOrders.length + " orders";
+                var pastList = document.getElementById("past-orders-list");
+                pastList.innerHTML = "";
+                state.pastOrders.forEach(function (po) {
+                    var row = document.createElement("div");
+                    row.className = "order-item";
+                    row.style.cursor = "default";
+                    row.innerHTML =
+                        "<div>" +
+                        "<div style='font-weight:700;color:#ffffff;font-size:0.86rem;'>" +
+                        escapeHtml(po.platform) +
+                        " • <span style='color:var(--text-muted);font-weight:600;'>" +
+                        escapeHtml(po.date) +
+                        "</span></div>" +
+                        "<div style='font-size:0.78rem;color:var(--text-secondary);'>" +
+                        escapeHtml(po.item) +
+                        " (" +
+                        escapeHtml(po.orderNumber) +
+                        ")</div>" +
+                        "</div>";
+
+                    var reBtn = document.createElement("button");
+                    reBtn.type = "button";
+                    reBtn.className = "btn btn-sm btn-cyan";
+                    reBtn.style.minHeight = "48px";
+                    reBtn.style.padding = "6px 12px";
+                    reBtn.style.fontSize = "0.78rem";
+                    reBtn.textContent = "Track Again";
+                    reBtn.addEventListener("click", function () {
+                        addOrTrackOrder(po.platform, po.orderNumber, po.item, "Re-tracked");
+                        closeOverlays();
+                    });
+                    row.appendChild(reBtn);
+                    pastList.appendChild(row);
+                });
+            }
+
+            function renderFindOrderModal() {
+                var q = (document.getElementById("input-platform-search").value || "").trim().toLowerCase();
+                var grid = document.getElementById("platform-chip-grid");
+                grid.innerHTML = "";
+
+                var filtered = SUPPORTED_PLATFORMS.filter(function (p) {
+                    if (!q) return true;
+                    return p.name.toLowerCase().indexOf(q) !== -1 || p.category.toLowerCase().indexOf(q) !== -1;
+                });
+
+                filtered.forEach(function (p) {
+                    var chip = document.createElement("button");
+                    chip.type = "button";
+                    chip.className = "platform-chip" + (p.name === state.selectedPlatform ? " is-selected" : "");
+                    chip.innerHTML =
+                        "<div>" +
+                        escapeHtml(p.name) +
+                        "</div><div style='font-size:0.7rem;color:var(--text-muted);font-weight:600;'>" +
+                        escapeHtml(p.category) +
+                        "</div>";
+                    chip.addEventListener("click", function () {
+                        state.selectedPlatform = p.name;
+                        renderFindOrderModal();
+                    });
+                    grid.appendChild(chip);
+                });
+            }
+
+            function escapeHtml(str) {
+                return String(str || "")
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;");
+            }
+
+            function renderAll() {
+                var geoInfo = evaluateGeofenceTransitions();
+                renderHeaderAndStats(geoInfo);
+                renderMapControls();
+                renderCoordinatesPanel();
+                renderCollegeAndRoutingPanel();
+                renderDropPinPanel();
+                renderOrdersAndLogs();
+                renderProfileDrawer();
+                renderMapFrame(performance.now());
+            }
+
+            function addOrTrackOrder(platform, orderNumber, itemText, etaStatusText) {
+                var cleanOrder = String(orderNumber || "").trim() || "ORD-" + Math.floor(10000 + Math.random() * 90000);
+                var cleanPlatform = String(platform || "Swiggy Instamart").trim();
+                var cleanItem = String(itemText || cleanPlatform + " Customer Order").trim();
+                var cleanEta = String(etaStatusText || "").trim();
+
+                var existing = state.activeOrders.find(function (o) {
+                    return o.orderNumber.toLowerCase() === cleanOrder.toLowerCase();
+                });
+
+                if (existing) {
+                    if (cleanEta) existing.etaStatus = cleanEta;
+                    state.selectedOrderId = existing.id;
+                } else {
+                    var created = {
+                        id: "ord-" + Date.now(),
+                        platform: cleanPlatform,
+                        orderNumber: cleanOrder,
+                        item: cleanItem,
+                        etaStatus: cleanEta || "Tracking Live",
+                        riderName: "Assigned Courier",
+                        vehicle: "DL-01-TR-" + Math.floor(1000 + Math.random() * 8999),
+                        pin: String(Math.floor(1000 + Math.random() * 9000))
+                    };
+                    state.activeOrders.unshift(created);
+                    state.selectedOrderId = created.id;
+
+                    state.pastOrders.unshift({
+                        id: "past-" + Date.now(),
+                        platform: cleanPlatform,
+                        orderNumber: cleanOrder,
+                        item: cleanItem,
+                        date: "Today"
+                    });
+                    if (state.pastOrders.length > 20) {
+                        state.pastOrders.length = 20;
+                    }
+                }
+
+                addLog(
+                    "Tracking " +
+                        cleanPlatform +
+                        " Order #" +
+                        cleanOrder +
+                        (cleanEta ? " (" + cleanEta + ")" : "") +
+                        " on DropRadar."
+                );
+                saveState();
+                renderAll();
+                showToast("Tracking " + cleanPlatform + " #" + cleanOrder);
+            }
+
+            function openModal(id) {
+                closeOverlays();
+                document.getElementById("ui-backdrop").classList.add("is-open");
+                document.getElementById(id).classList.add("is-open");
+            }
+
+            function closeOverlays() {
+                document.getElementById("ui-backdrop").classList.remove("is-open");
+                document.getElementById("find-order-modal").classList.remove("is-open");
+                document.getElementById("profile-drawer").classList.remove("is-open");
+            }
+
+            function bindEvents() {
+                // Header actions
+                document.getElementById("btn-open-find-order").addEventListener("click", function () {
+                    renderFindOrderModal();
+                    openModal("find-order-modal");
+                });
+                document.getElementById("btn-card-find-order").addEventListener("click", function () {
+                    renderFindOrderModal();
+                    openModal("find-order-modal");
+                });
+                document.getElementById("btn-close-find-order").addEventListener("click", closeOverlays);
+
+                document.getElementById("btn-open-profile-drawer").addEventListener("click", function () {
+                    renderProfileDrawer();
+                    openModal("profile-drawer");
+                });
+                document.getElementById("btn-close-profile-drawer").addEventListener("click", closeOverlays);
+                document.getElementById("ui-backdrop").addEventListener("click", closeOverlays);
+
+                document.getElementById("btn-toggle-large-text").addEventListener("click", function () {
+                    state.largeText = !state.largeText;
+                    saveState();
+                    renderAll();
+                    showToast(state.largeText ? "Aa+ Large Text enabled" : "Standard text size restored");
+                });
+
+                // Map layer modes & Satellite Labels & Grid toggle
+                document.querySelectorAll("[data-layer-mode]").forEach(function (btn) {
+                    btn.addEventListener("click", function () {
+                        state.layerMode = btn.getAttribute("data-layer-mode");
+                        saveState();
+                        renderAll();
+                    });
+                });
+
+                document.getElementById("btn-toggle-sat-labels").addEventListener("click", function () {
+                    state.satLabelsGrid = !state.satLabelsGrid;
+                    saveState();
+                    renderAll();
+                    showToast(state.satLabelsGrid ? "Labels & Grid ON" : "Labels & Grid OFF");
+                });
+
+                // Click-to-place pin mode
+                document.querySelectorAll("[data-click-mode]").forEach(function (btn) {
+                    btn.addEventListener("click", function () {
+                        state.clickMode = btn.getAttribute("data-click-mode");
+                        saveState();
+                        renderAll();
+                    });
+                });
+
+                // Home Geofence radius buttons
+                document.querySelectorAll("[data-radius]").forEach(function (btn) {
+                    btn.addEventListener("click", function () {
+                        state.home.radius = Number(btn.getAttribute("data-radius")) || 500;
+                        state.rider.wasInsideHome = false;
+                        addLog("Updated Home Geofence alert radius to " + state.home.radius + "m.");
+                        saveState();
+                        renderAll();
+                    });
+                });
+
+                // College Zone radius buttons
+                document.querySelectorAll("[data-college-radius]").forEach(function (btn) {
+                    btn.addEventListener("click", function () {
+                        state.college.radius = Number(btn.getAttribute("data-college-radius")) || 300;
+                        addLog("Updated College Zone radius to " + state.college.radius + "m.");
+                        saveState();
+                        renderAll();
+                    });
+                });
+
+                // Zoom & Reset
+                document.getElementById("btn-zoom-in").addEventListener("click", function () {
+                    state.zoom = Math.min(3.5, Number(((state.zoom || 1) * 1.25).toFixed(2)));
+                    saveState();
+                    renderAll();
+                });
+                document.getElementById("btn-zoom-out").addEventListener("click", function () {
+                    state.zoom = Math.max(0.5, Number(((state.zoom || 1) / 1.25).toFixed(2)));
+                    saveState();
+                    renderAll();
+                });
+                document.getElementById("btn-zoom-reset").addEventListener("click", function () {
+                    state.zoom = 1;
+                    state.panX = 0;
+                    state.panY = 0;
+                    saveState();
+                    renderAll();
+                });
+
+                // Map click/tap to set Home / College / Drop Pin
+                var canvas = document.getElementById("radar-canvas");
+                canvas.addEventListener("click", function (e) {
+                    var pack = getCanvasContext();
+                    if (!pack) return;
+                    var rect = canvas.getBoundingClientRect();
+                    var px = e.clientX - rect.left;
+                    var py = e.clientY - rect.top;
+                    var ll = screenToLatLng(px, py, pack.w, pack.h);
+
+                    if (state.clickMode === "college") {
+                        state.college.lat = ll.lat;
+                        state.college.lng = ll.lng;
+                        addLog("Set College Zone pin at " + formatDecimal(ll.lat) + ", " + formatDecimal(ll.lng) + ".");
+                        showToast("College Zone updated (" + formatDecimal(ll.lat) + ", " + formatDecimal(ll.lng) + ")");
+                    } else if (state.clickMode === "drop") {
+                        state.dropPin.source = "custom";
+                        state.dropPin.customLat = ll.lat;
+                        state.dropPin.customLng = ll.lng;
+                        addLog("Set Custom Drop Pin at " + formatDecimal(ll.lat) + ", " + formatDecimal(ll.lng) + ".");
+                        showToast("Custom Drop Pin set");
+                    } else {
+                        state.home.lat = ll.lat;
+                        state.home.lng = ll.lng;
+                        state.rider.wasInsideHome = false;
+                        addLog("Set Home Zone pin at " + formatDecimal(ll.lat) + ", " + formatDecimal(ll.lng) + ".");
+                        showToast("Home Pin updated");
+                    }
+                    saveState();
+                    renderAll();
+                });
+
+                // Rider simulation & GPS watch
+                document.getElementById("btn-sim-approach").addEventListener("click", function () {
+                    var offsetLat = (state.home.radius * 0.45) / 111320;
+                    var offsetLng = (state.home.radius * 0.35) / (111320 * Math.cos((state.home.lat * Math.PI) / 180));
+                    state.rider.lat = Number((state.home.lat + offsetLat).toFixed(6));
+                    state.rider.lng = Number((state.home.lng + offsetLng).toFixed(6));
+                    saveState();
+                    renderAll();
+                });
+
+                document.getElementById("btn-sim-step").addEventListener("click", function () {
+                    var dLat = state.home.lat - state.rider.lat;
+                    var dLng = state.home.lng - state.rider.lng;
+                    var dist = Math.max(1, computeDistanceMeters(state.home.lat, state.home.lng, state.rider.lat, state.rider.lng));
+                    var stepMeters = Math.min(180, dist);
+                    var ratio = stepMeters / dist;
+                    state.rider.lat = Number((state.rider.lat + dLat * ratio).toFixed(6));
+                    state.rider.lng = Number((state.rider.lng + dLng * ratio).toFixed(6));
+                    addLog("Stepped driver ~" + stepMeters + "m closer toward Home Zone.");
+                    saveState();
+                    renderAll();
+                });
+
+                document.getElementById("btn-sim-reset").addEventListener("click", function () {
+                    state.rider.lat = Number((state.home.lat + 0.0085).toFixed(6));
+                    state.rider.lng = Number((state.home.lng + 0.0072).toFixed(6));
+                    state.rider.wasInsideHome = false;
+                    addLog("Reset rider outside Home perimeter.");
+                    saveState();
+                    renderAll();
+                });
+
+                document.getElementById("btn-watch-gps").addEventListener("click", function () {
+                    toggleLiveGpsWatch(!state.liveGps.watching);
+                });
+
+                // Location presets
+                document.querySelectorAll("[data-preset]").forEach(function (btn) {
+                    btn.addEventListener("click", function () {
+                        var key = btn.getAttribute("data-preset");
+                        var p = LOCATION_PRESETS[key];
+                        if (!p) return;
+                        state.home.lat = p.homeLat;
+                        state.home.lng = p.homeLng;
+                        state.college.lat = p.collegeLat;
+                        state.college.lng = p.collegeLng;
+                        state.rider.lat = p.riderLat;
+                        state.rider.lng = p.riderLng;
+                        state.rider.wasInsideHome = false;
+                        addLog("Loaded preset coordinates: " + p.label + ".");
+                        saveState();
+                        renderAll();
+                        showToast("Loaded " + p.label);
+                    });
+                });
+
+                // Coordinate apply & copy buttons
+                document.getElementById("btn-apply-home-coord").addEventListener("click", function () {
+                    var lat = parseFloat(document.getElementById("input-home-lat").value);
+                    var lng = parseFloat(document.getElementById("input-home-lng").value);
+                    if (!isFinite(lat) || !isFinite(lng)) {
+                        showToast("Enter valid Home Latitude and Longitude");
+                        return;
+                    }
+                    state.home.lat = Number(lat.toFixed(6));
+                    state.home.lng = Number(lng.toFixed(6));
+                    state.rider.wasInsideHome = false;
+                    addLog("Applied Home coordinates: " + formatDecimal(state.home.lat) + ", " + formatDecimal(state.home.lng) + ".");
+                    saveState();
+                    renderAll();
+                    showToast("Home coordinates updated");
+                });
+
+                document.getElementById("btn-apply-college-coord").addEventListener("click", function () {
+                    var lat = parseFloat(document.getElementById("input-college-lat").value);
+                    var lng = parseFloat(document.getElementById("input-college-lng").value);
+                    if (!isFinite(lat) || !isFinite(lng)) {
+                        showToast("Enter valid College Latitude and Longitude");
+                        return;
+                    }
+                    state.college.lat = Number(lat.toFixed(6));
+                    state.college.lng = Number(lng.toFixed(6));
+                    addLog("Applied College coordinates: " + formatDecimal(state.college.lat) + ", " + formatDecimal(state.college.lng) + ".");
+                    saveState();
+                    renderAll();
+                    showToast("College coordinates updated");
+                });
+
+                document.getElementById("btn-apply-rider-coord").addEventListener("click", function () {
+                    var lat = parseFloat(document.getElementById("input-rider-lat").value);
+                    var lng = parseFloat(document.getElementById("input-rider-lng").value);
+                    if (!isFinite(lat) || !isFinite(lng)) {
+                        showToast("Enter valid Rider Latitude and Longitude");
+                        return;
+                    }
+                    state.rider.lat = Number(lat.toFixed(6));
+                    state.rider.lng = Number(lng.toFixed(6));
+                    addLog("Applied Rider coordinates: " + formatDecimal(state.rider.lat) + ", " + formatDecimal(state.rider.lng) + ".");
+                    saveState();
+                    renderAll();
+                    showToast("Rider coordinates updated");
+                });
+
+                document.getElementById("btn-copy-home-coord").addEventListener("click", function () {
+                    copyToClipboard(formatDecimal(state.home.lat) + ", " + formatDecimal(state.home.lng), "Home Coordinates");
+                });
+                document.getElementById("btn-copy-college-coord").addEventListener("click", function () {
+                    copyToClipboard(formatDecimal(state.college.lat) + ", " + formatDecimal(state.college.lng), "College Coordinates");
+                });
+                document.getElementById("btn-copy-rider-coord").addEventListener("click", function () {
+                    copyToClipboard(formatDecimal(state.rider.lat) + ", " + formatDecimal(state.rider.lng), "Rider Coordinates");
+                });
+
+                // College Zone auto-routing controls
+                document.getElementById("input-college-name").addEventListener("input", function (e) {
+                    state.college.name = e.target.value;
+                    saveState();
+                });
+
+                document.getElementById("btn-enter-college").addEventListener("click", function () {
+                    setCollegeZoneState(true, "Manual Button");
+                    saveState();
+                    renderAll();
+                });
+
+                document.getElementById("btn-leave-college").addEventListener("click", function () {
+                    setCollegeZoneState(false, "Manual Button");
+                    saveState();
+                    renderAll();
+                });
+
+                document.getElementById("btn-gps-as-college").addEventListener("click", function () {
+                    if (!navigator.geolocation || !navigator.geolocation.getCurrentPosition) {
+                        showToast("Geolocation unavailable — enter College Lat/Lng manually");
+                        return;
+                    }
+                    showToast("Fetching current GPS for College Zone...");
+                    navigator.geolocation.getCurrentPosition(
+                        function (pos) {
+                            var cLat = Number(pos.coords.latitude.toFixed(6));
+                            var cLng = Number(pos.coords.longitude.toFixed(6));
+                            state.college.lat = cLat;
+                            state.college.lng = cLng;
+                            applyLiveGpsCoords(cLat, cLng, pos.coords.accuracy, "Set College GPS");
+                            setCollegeZoneState(true, "Current GPS Set");
+                            saveState();
+                            renderAll();
+                        },
+                        function () {
+                            showToast("Could not get GPS — enter College Lat/Lng manually");
+                        },
+                        { enableHighAccuracy: true, timeout: 8000 }
+                    );
+                });
+
+                document.getElementById("btn-check-gps-now").addEventListener("click", function () {
+                    if (!navigator.geolocation || !navigator.geolocation.getCurrentPosition) {
+                        state.liveGps.statusText = "Geolocation unavailable — use I Entered College Zone button";
+                        showToast("Geolocation unavailable");
+                        renderDropPinPanel();
+                        return;
+                    }
+                    showToast("Checking live GPS...");
+                    navigator.geolocation.getCurrentPosition(
+                        function (pos) {
+                            applyLiveGpsCoords(
+                                pos.coords.latitude,
+                                pos.coords.longitude,
+                                pos.coords.accuracy,
+                                "GPS Check"
+                            );
+                            var dCol = computeDistanceMeters(
+                                pos.coords.latitude,
+                                pos.coords.longitude,
+                                state.college.lat,
+                                state.college.lng
+                            );
+                            addLog("GPS check at " + dCol + "m from College Zone.");
+                            saveState();
+                            renderAll();
+                            showToast("GPS checked (" + dCol + "m from College Zone)");
+                        },
+                        function () {
+                            state.liveGps.statusText = "Location permission denied or unavailable";
+                            showToast("Location permission denied or unavailable");
+                            renderDropPinPanel();
+                        },
+                        { enableHighAccuracy: true, timeout: 8000 }
+                    );
+                });
+
+                document.getElementById("toggle-college-autoroute").addEventListener("click", function () {
+                    state.college.autoRoute = !state.college.autoRoute;
+                    addLog("College Zone auto-call routing " + (state.college.autoRoute ? "ENABLED." : "DISABLED."));
+                    saveState();
+                    renderAll();
+                });
+
+                document.getElementById("toggle-quiet-home").addEventListener("click", function () {
+                    state.quietHomeMode = !state.quietHomeMode;
+                    addLog("Zero-Call / Quiet Mode at Home " + (state.quietHomeMode ? "ENABLED." : "DISABLED."));
+                    saveState();
+                    renderAll();
+                });
+
+                // Drop pin & quiet note controls
+                document.querySelectorAll("[data-drop-source]").forEach(function (btn) {
+                    btn.addEventListener("click", function () {
+                        state.dropPin.source = btn.getAttribute("data-drop-source");
+                        saveState();
+                        renderAll();
+                    });
+                });
+
+                document.getElementById("btn-toggle-precision").addEventListener("click", function () {
+                    state.dropPin.precision = state.dropPin.precision === "exact" ? "approx" : "exact";
+                    saveState();
+                    renderAll();
+                });
+
+                document.getElementById("toggle-autosend-pin").addEventListener("click", function () {
+                    state.dropPin.autoSendOnEntry = !state.dropPin.autoSendOnEntry;
+                    saveState();
+                    renderAll();
+                });
+
+                document.getElementById("input-drop-note").addEventListener("input", function (e) {
+                    state.dropPin.note = e.target.value;
+                    saveState();
+                    renderDropPinPanel();
+                });
+
+                document.getElementById("btn-copy-gmaps").addEventListener("click", function () {
+                    var c = getActiveDropCoords();
+                    copyToClipboard(buildGoogleMapsUrl(c.lat, c.lng), "Google Maps Link");
+                });
+
+                document.getElementById("btn-copy-osm").addEventListener("click", function () {
+                    var c = getActiveDropCoords();
+                    copyToClipboard(buildOpenStreetMapUrl(c.lat, c.lng), "OpenStreetMap Link");
+                });
+
+                document.getElementById("btn-copy-quiet-note").addEventListener("click", function () {
+                    copyToClipboard(buildQuietPayloadText(), "Quiet Delivery Note");
+                });
+
+                document.getElementById("btn-log-dispatch").addEventListener("click", function () {
+                    state.dropPin.logged = true;
+                    var c = getActiveDropCoords();
+                    addLog("Logged driver dispatch payload for " + c.label + " (" + formatDecimal(c.lat) + ", " + formatDecimal(c.lng) + ").");
+                    saveState();
+                    renderAll();
+                    showToast("Dispatch logged");
+                });
+
+                document.getElementById("btn-reset-dispatch").addEventListener("click", function () {
+                    state.dropPin.logged = false;
+                    state.dropPin.source = "home";
+                    saveState();
+                    renderAll();
+                    showToast("Dispatch reset");
+                });
+
+                // Find Your Order modal
+                document.getElementById("input-platform-search").addEventListener("input", renderFindOrderModal);
+                document.getElementById("btn-confirm-order-number").addEventListener("click", function () {
+                    var input = document.getElementById("input-customer-order-number");
+                    var etaInput = document.getElementById("input-order-eta-status");
+                    var code = (input.value || "").trim();
+                    if (!code) {
+                        showToast("Enter a Customer Order Number");
+                        input.focus();
+                        return;
+                    }
+                    var etaVal = (etaInput.value || "").trim();
+                    addOrTrackOrder(state.selectedPlatform, code, state.selectedPlatform + " Order #" + code, etaVal);
+                    input.value = "";
+                    etaInput.value = "";
+                    closeOverlays();
+                });
+
+                document.querySelectorAll("[data-sample-order]").forEach(function (btn) {
+                    btn.addEventListener("click", function () {
+                        var parts = (btn.getAttribute("data-sample-order") || "").split("|");
+                        addOrTrackOrder(
+                            parts[0] || "Swiggy Instamart",
+                            parts[1] || "ORD-10001",
+                            parts[2] || "Sample Order",
+                            parts[3] || "Tracking Live"
+                        );
+                        closeOverlays();
+                    });
+                });
+
+                // Profile drawer controls
+                document.getElementById("btn-save-profile").addEventListener("click", function () {
+                    state.profile.name = (document.getElementById("input-profile-name").value || "").trim() || "Customer";
+                    state.profile.livingMode = document.getElementById("select-living-mode").value;
+                    addLog("Saved profile for " + state.profile.name + " (" + state.profile.livingMode + ").");
+                    saveState();
+                    renderAll();
+                    showToast("Profile saved");
+                });
+
+                document.getElementById("btn-save-alternate").addEventListener("click", function () {
+                    state.alternate.name = (document.getElementById("input-alt-name").value || "").trim() || "Backup Contact";
+                    state.alternate.role = (document.getElementById("input-alt-role").value || "").trim() || "Alternate";
+                    state.alternate.phone = (document.getElementById("input-alt-phone").value || "").trim() || "+91 90000 04821";
+                    addLog("Updated Alternate Number for " + state.alternate.name + " (Relay #DR-804).");
+                    saveState();
+                    renderAll();
+                    showToast("Alternate number saved");
+                });
+
+                document.getElementById("btn-drawer-mask-toggle").addEventListener("click", function () {
+                    state.alternate.showReal = !state.alternate.showReal;
+                    saveState();
+                    renderProfileDrawer();
+                });
+
+                // Log clear & recovery reset
+                document.getElementById("btn-clear-log").addEventListener("click", function () {
+                    state.logs = [{ time: nowTimeLabel(), text: "Activity log cleared." }];
+                    saveState();
+                    renderOrdersAndLogs();
+                });
+
+                document.getElementById("btn-recover-reset").addEventListener("click", function () {
+                    try {
+                        localStorage.removeItem(STORAGE_KEY);
+                    } catch (_) {}
+                    window.location.reload();
+                });
+
+                window.addEventListener("resize", function () {
+                    renderMapFrame(performance.now());
+                });
+
+                if (typeof ResizeObserver !== "undefined") {
+                    var vp = document.getElementById("map-viewport");
+                    if (vp) {
+                        resizeObserverInstance = new ResizeObserver(function () {
+                            renderMapFrame(performance.now());
+                        });
+                        resizeObserverInstance.observe(vp);
+                    }
+                }
+            }
+
+            function initApp() {
+                try {
+                    loadState();
+                    bindEvents();
+                    renderAll();
+                    startRadarLoop();
+                } catch (err) {
+                    showErrorBoundary(err);
+                }
+            }
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", initApp);
+            } else {
+                initApp();
+            }
+        })();
+    </script>
+</body>
+</html>
