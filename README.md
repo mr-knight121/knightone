@@ -22,3 +22,4 @@ A quiet package tracking and geofence proximity web app built to reduce unwanted
 ## Notes & Limitations
 - This project runs as a client-side web app with simulated/local tracking state and browser `localStorage` persistence.
 - Real-world live GPS feeds from third-party delivery apps, automated OTP entry, and carrier-level telecom call forwarding are not performed directly inside the static browser app.
+![DropRadar Logo](logo.png)
